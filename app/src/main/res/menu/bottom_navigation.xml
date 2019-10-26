@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_nav_home"
+        android:icon="@drawable/ic_home_solid_black"
+        android:title="Home"/>
+
+    <item
+        android:id="@+id/bottom_nav_collection"
+        android:icon="@drawable/ic_collection_border_black"
+        android:title="Collections"/>
+
+
+    <item
+        android:id="@+id/bottom_nav_notification"
+        android:icon="@drawable/ic_notifications_none_border_black"
+        android:title="Notifications"/>
+
+    <item
+        android:id="@+id/bottom_nav_account"
+        android:icon="@drawable/ic_account_border_circle_black"
+        android:title="Profile"/>
+
+
+
+
+</menu>

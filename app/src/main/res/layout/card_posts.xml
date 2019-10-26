@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fadingEdgeLength="10dp"
+    android:padding="15dp"
+    android:outlineSpotShadowColor="@color/gray">
+
+    <RelativeLayout
+        android:id="@+id/post_header_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp">
+
+        <RelativeLayout
+            android:id="@+id/post_header"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp">
+
+            <ImageView
+                android:id="@+id/author_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="10dp"
+                tools:srcCompat="@tools:sample/avatars[0]" />
+
+            <TextView
+                android:id="@+id/author_title_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:layout_toEndOf="@id/author_avatar"
+                android:fontFamily="@font/nunito"
+                android:text="John Wick"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/author_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toEndOf="@id/author_avatar"
+                android:fontFamily="@font/nunito"
+                android:text="johnwick" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/post_body_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/post_header"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/author_post"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito"
+                android:text="@string/lorem"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/author_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito"
+                android:text="- johnwick"
+                android:textAlignment="viewEnd" />
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

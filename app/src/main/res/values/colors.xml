@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">#171717</color>
+<!--    <color name="colorAccent">#D81B60</color>-->
+
+    <color name="colorAccent">#535353</color>
+
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="colorWhite">#ffffff</color>
+<!--    <color name="dark_lighten_1">#1f1f1f</color>-->
+    <color name="dark_lighten_1">#171717</color>
+    <color name="dark_lighten_2">#4d4d4d</color>
+
+    <color name="whitesmoke">#f2f2f2</color>
+
+    <color name="gray">#6d6d6d</color>
+
+    <color name="red">#F44336</color>
+    <color name="blue">#1E88E5</color>
+</resources>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="30dp"
+    tools:context=".SignupActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nunito"
+        android:text="@string/activity_signup_name"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="30sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/signupUsernameField"
+                    style="@style/TransparentBgTextbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="username"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/gray" />
+
+                <ProgressBar
+                    android:id="@+id/signupUsernameProgressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/signupUsernameCheckImageView"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_check_white" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/signupUsernameErrMsg"
+                style="@style/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/signupEmailField"
+                style="@style/TransparentBgTextbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="email"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/gray" />
+
+            <TextView
+                android:id="@+id/signupEmailErrMsg"
+                style="@style/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/signupPasswordField"
+                style="@style/TransparentBgTextbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:hint="password"
+                android:inputType="textPassword"
+                android:textColor="@color/colorWhite"
+                android:textColorHint="@color/gray" />
+
+            <TextView
+                android:id="@+id/signupPasswordErrMsg"
+                style="@style/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/signupShowPwdCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Password"
+            android:textColor="@color/gray" />
+
+        <Button
+            android:id="@+id/signupSubmitBtn"
+            style="@style/lightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="30dp"
+            android:clickable="false"
+            android:onClick="signupSubmit"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:text="Signup"
+            android:textSize="22sp" />
+
+        <ProgressBar
+            android:id="@+id/signupProgressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            android:fontFamily="@font/nunito"
+            android:text="Already Registered?"
+            android:textAlignment="center"
+            android:textColor="@color/gray"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/signupGoToLoginBtn"
+            style="@style/lightButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="goToLoginActivity"
+            android:text="Login"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

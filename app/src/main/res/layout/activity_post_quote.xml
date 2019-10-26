@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PostQuote">
+
+    <include
+        layout="@layout/quotebox_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_arrow_back_white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dark_solid_border"
+            android:ems="10"
+            android:fontFamily="@font/nunito"
+            android:hint="Add tags"
+            android:inputType="textPersonName"
+            android:padding="10dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/dark_solid_border"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="Write your quote"
+            android:inputType="textMultiLine"
+            android:padding="10dp" />
+
+        <RelativeLayout
+            android:id="@+id/postQuoteBtnWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/postQuoteCancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/dark_solid_border"
+                android:fontFamily="@font/nunito_semibold"
+                android:text="@android:string/cancel"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/postQuoteSubmitBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="206dp"
+                android:layout_toEndOf="@+id/postQuoteCancelBtn"
+                android:background="@drawable/dark_rounded_solid_bg"
+                android:fontFamily="@font/nunito_semibold"
+                android:text="Post"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
