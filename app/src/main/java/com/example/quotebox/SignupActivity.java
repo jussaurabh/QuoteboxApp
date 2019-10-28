@@ -21,7 +21,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.quotebox.controllers.InsertData;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,7 +29,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
@@ -41,7 +39,6 @@ public class SignupActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firestore;
     CollectionNames collectionNames;
-    InsertData insertData;
     Users users;
 
     EditText signupUsernameField, signupEmailField, signupPasswordField;
@@ -59,7 +56,6 @@ public class SignupActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
         collectionNames = new CollectionNames();
-        insertData = new InsertData();
         users = new Users();
 
         signupUsernameField = findViewById(R.id.signupUsernameField);
@@ -247,7 +243,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("SIGNUP : ", "createUserWithEmailAndPassword SUCCESS USERID : " + task.getResult().getUser().getUid());
+                            Log.d("SIGNUP : ", "createUserWithEmailAndPassword SUCCESS USER_ID : " + task.getResult().getUser().getUid());
 
 
 

@@ -8,23 +8,18 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.CollectionFragment;
 import com.example.quotebox.ui.HomeFragment;
@@ -39,7 +34,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
@@ -62,8 +56,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     ImageView nav_header_avatar;
     NavigationView navigationView;
     BottomNavigationView bottomNavigationView;
-    FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab;
-    ConstraintLayout quoteFabWrapper, poemFabWrapper;
+    FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab, storyPostFab;
+    ConstraintLayout quoteFabWrapper, poemFabWrapper, storyFabWrapper;
 
     boolean isFloatingBtnOpen = false;
 
@@ -96,8 +90,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         homeFramentFloatingButton = findViewById(R.id.homeFramentFloatingButton);
         quoteFabWrapper = findViewById(R.id.quoteFabWrapper);
         poemFabWrapper = findViewById(R.id.poemFabWrapper);
+        storyFabWrapper = findViewById(R.id.storyFabWrapper);
         quotePostFab = findViewById(R.id.quotePostFab);
         poemPostFab = findViewById(R.id.poemPostFab);
+        storyPostFab = findViewById(R.id.storyPostFab);
 
 
         if (firebaseUser.getPhotoUrl() != null) {
@@ -105,8 +101,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     .transform(new ImageCircleTransform())
                     .into(nav_header_avatar);
         }
-
-
+        else {
+            Picasso.get().load(R.mipmap.ic_avatar_placeholder_round)
+                    .transform(new ImageCircleTransform())
+                    .into(nav_header_avatar);
+        }
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
@@ -128,7 +127,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 if (quoteFabWrapper.getVisibility() == View.GONE &&
-                        poemFabWrapper.getVisibility() == View.GONE) {
+                        poemFabWrapper.getVisibility() == View.GONE &&
+                        storyFabWrapper.getVisibility() == View.GONE) {
                     displayFabBtn();
                 }
                 else {
@@ -143,7 +143,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 hideFabBtn();
-                startActivity(new Intent(HomeActivity.this, PostQuote.class));
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Quote"));
+            }
+        });
+
+        poemPostFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideFabBtn();
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Poem"));
+            }
+        });
+
+        storyPostFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideFabBtn();
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Story"));
             }
         });
     }
@@ -236,12 +252,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         homeFramentFloatingButton.setImageResource(R.drawable.ic_close_white);
         quoteFabWrapper.setVisibility(View.VISIBLE);
         poemFabWrapper.setVisibility(View.VISIBLE);
+        storyFabWrapper.setVisibility(View.VISIBLE);
     }
 
     private void hideFabBtn() {
         homeFramentFloatingButton.setImageResource(R.drawable.ic_edit_white);
         quoteFabWrapper.setVisibility(View.GONE);
         poemFabWrapper.setVisibility(View.GONE);
+        storyFabWrapper.setVisibility(View.GONE);
     }
 
 }

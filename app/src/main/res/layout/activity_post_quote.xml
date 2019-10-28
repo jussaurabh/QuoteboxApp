@@ -5,77 +5,130 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".PostQuote">
+    tools:context=".PostQuoteActivity">
 
     <include
         layout="@layout/quotebox_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_arrow_back_white" />
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/postAddBtnLL"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/dark_solid_border"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_add_a_photo_black" />
+
+                    <TextView
+                        android:id="@+id/postAddImageBtnTag"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:text="Add Quote Image"
+                        android:textAlignment="center" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/postImageWrapperRL"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <ImageButton
+                        android:id="@+id/removePostImageIB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:background="@color/transparent"
+                        android:padding="7dp"
+                        app:srcCompat="@drawable/ic_close_black" />
+
+                    <ImageView
+                        android:id="@+id/postImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/postTitleErrMsgTV"
+                style="@style/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/postTitleEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/dark_solid_border"
+                android:ems="10"
+                android:hint="Quote Title"
+                android:inputType="textPersonName"
+                android:padding="10dp" />
+
+            <TextView
+                android:id="@+id/postErrMsgTV"
+                style="@style/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/postEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/dark_solid_border"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Write your quote"
+                android:inputType="textMultiLine"
+                android:minHeight="200dp"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="15dp">
 
-        <EditText
-            android:id="@+id/editText"
+        <Button
+            android:id="@+id/postSubmitBtn"
+            style="@style/darkButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dark_solid_border"
-            android:ems="10"
-            android:fontFamily="@font/nunito"
-            android:hint="Add tags"
-            android:inputType="textPersonName"
-            android:padding="10dp"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp" />
-
-        <EditText
-            android:id="@+id/editText2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/dark_solid_border"
-            android:ems="10"
-            android:gravity="start|top"
-            android:hint="Write your quote"
-            android:inputType="textMultiLine"
-            android:padding="10dp" />
-
-        <RelativeLayout
-            android:id="@+id/postQuoteBtnWrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/postQuoteCancelBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="0dp"
-                android:background="@drawable/dark_solid_border"
-                android:fontFamily="@font/nunito_semibold"
-                android:text="@android:string/cancel"
-                android:textAllCaps="false"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/postQuoteSubmitBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="206dp"
-                android:layout_toEndOf="@+id/postQuoteCancelBtn"
-                android:background="@drawable/dark_rounded_solid_bg"
-                android:fontFamily="@font/nunito_semibold"
-                android:text="Post"
-                android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
-                android:textSize="18sp" />
-        </RelativeLayout>
+            android:text="Post"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
+
 </LinearLayout>

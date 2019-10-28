@@ -30,7 +30,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.0'
     implementation 'com.google.firebase:firebase-auth:19.0.0'
     implementation 'com.google.firebase:firebase-firestore:21.2.0'
-    implementation 'com.firebaseui:firebase-ui-firestore:6.0.2'
+//    implementation 'com.firebaseui:firebase-ui-firestore:6.0.2'
+    implementation 'com.google.firebase:firebase-storage:19.1.0'
     // ---
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
@@ -40,6 +41,7 @@ dependencies {
 
     // custom liberaries
     implementation "androidx.recyclerview:recyclerview:1.0.0"
+    implementation 'com.google.android.material:material:1.2.0-alpha01'
 //    implementation 'de.hdodenhof:circleimageview:3.0.1'
     // --
 

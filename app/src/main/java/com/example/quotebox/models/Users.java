@@ -49,7 +49,7 @@ public class Users {
     
     public Map<String,Object> getUsersCreds() {
         Map<String, Object> userData = new HashMap<>();
-        userData.put(USERNAME, this.username);
+        userData.put(USERNAME, username);
         userData.put(EMAIL, email);
         userData.put(PASSWORD, password);
         userData.put(USERAVATAR, userAvatar);
