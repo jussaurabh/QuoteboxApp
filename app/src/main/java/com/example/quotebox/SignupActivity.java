@@ -261,7 +261,7 @@ public class SignupActivity extends AppCompatActivity {
 
                             firestore.collection(collectionNames.getUserCollection())
                                     .document(task.getResult().getUser().getUid())
-                                    .set(users.getUsersCreds())
+                                    .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {

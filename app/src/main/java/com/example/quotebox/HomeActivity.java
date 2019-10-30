@@ -96,17 +96,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         storyPostFab = findViewById(R.id.storyPostFab);
 
 
-        if (firebaseUser.getPhotoUrl() != null) {
-            Picasso.get().load(firebaseUser.getPhotoUrl())
-                    .transform(new ImageCircleTransform())
-                    .into(nav_header_avatar);
-        }
-        else {
-            Picasso.get().load(R.mipmap.ic_avatar_placeholder_round)
-                    .transform(new ImageCircleTransform())
-                    .into(nav_header_avatar);
-        }
-
 
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
 
@@ -243,6 +232,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                         nav_header_username.setText(users.getUsername());
                         nav_header_email.setText(users.getEmail());
+
+                        if (firebaseUser.getPhotoUrl() != null) {
+                            Picasso.get().load(firebaseUser.getPhotoUrl())
+                                    .transform(new ImageCircleTransform())
+                                    .into(nav_header_avatar);
+                        }
                     }
                 });
     }

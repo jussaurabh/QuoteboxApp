@@ -33,6 +33,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -162,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void loginWithEmailAndPassword(String email, String password) {
+    public void loginWithEmailAndPassword(final String email, String password) {
         loginProgressBar.setVisibility(View.VISIBLE);
         loginSubmitBtn.setVisibility(View.GONE);
 
@@ -171,7 +173,21 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Log.d("LOGIN: ", "loginWithEmailAndPassword SUCCESS");
-                    preferencesConfig.setLoginStatus(true);
+
+                    firestore.collection(collectionNames.getUserCollection()).whereEqualTo(Users.EMAIL, email)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d("LOGIN_LOG ", "USERNAME : " + task.getResult().getDocuments().get(0).getString(Users.USERNAME));
+                                        String uname = task.getResult().getDocuments().get(0).getString(Users.USERNAME);
+                                        preferencesConfig.setLoggedInUserCreds(uname);
+                                    }
+                                }
+                            });
+
+
 
                     finish();
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
@@ -256,7 +272,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("LOGIN_TAG", "LOGIN SUCCESS");
 
                             Users users = new Users(
-                                    account.getDisplayName(),
+                                    account.getEmail().split("@")[0],
                                     account.getEmail(),
                                     "",
                                     account.getPhotoUrl().toString(),
@@ -268,14 +284,13 @@ public class LoginActivity extends AppCompatActivity {
 
                             firestore.collection(collectionNames.getUserCollection())
                                     .document(task.getResult().getUser().getUid())
-                                    .set(users.getUsersCreds())
+                                    .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             Toast.makeText(LoginActivity.this, "LOGIN SUCCESS ", Toast.LENGTH_SHORT).show();
                                             loginWithGoogleBtn.setVisibility(View.VISIBLE);
                                             loginWithGoogleProgressBar.setVisibility(View.GONE);
-                                            preferencesConfig.setLoginStatus(true);
                                             finish();
                                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                         }

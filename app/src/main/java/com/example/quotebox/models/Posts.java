@@ -1,6 +1,8 @@
 package com.example.quotebox.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Posts {
@@ -11,6 +13,8 @@ public class Posts {
 
     // field names
     public static final String POST_TITLE = "postTitle";
+    public static final String POST_ID = "postId";
+    public static final String POST_USER = "postUser";
     public static final String POST = "post";
     public static final String POST_IMAGE = "postImage";
     public static final String POST_TYPE = "postType";
@@ -18,13 +22,16 @@ public class Posts {
     public static final String POST_LIKES = "postLikes";
     public static final String POST_COMMENTS = "postComments";
 
+    private String postId;
     private String postTitle;
+    private String postUser;
     private String post;
     private String postImage;
     private String postType;
     private String userId;
     private int postLikes;
     private int postComments;
+    private List<Posts> allPostsList = new ArrayList<>();
 
     public Posts() {}
 
@@ -33,6 +40,7 @@ public class Posts {
                  String postImage,
                  String postType,
                  String userId,
+                 String postUser,
                  int postLikes,
                  int postComments) {
         this.postTitle = postTitle;
@@ -40,22 +48,23 @@ public class Posts {
         this.postImage = postImage;
         this.postType = postType;
         this.userId = userId;
+        this.postUser = postUser;
         this.postLikes = postLikes;
         this.postComments = postComments;
     }
 
-    public Map<String, Object> getPostsCreds() {
-        Map<String, Object> postCreds = new HashMap<>();
-        postCreds.put(POST_TITLE, postTitle);
-        postCreds.put(POST, post);
-        postCreds.put(POST_IMAGE, postImage);
-        postCreds.put(POST_TYPE, postType);
-        postCreds.put(USER_ID, userId);
-        postCreds.put(POST_LIKES, postLikes);
-        postCreds.put(POST_COMMENTS, postComments);
-
-        return postCreds;
-    }
+//    public Map<String, Object> getPostsCreds() {
+//        Map<String, Object> postCreds = new HashMap<>();
+//        postCreds.put(POST_TITLE, postTitle);
+//        postCreds.put(POST, post);
+//        postCreds.put(POST_IMAGE, postImage);
+//        postCreds.put(POST_TYPE, postType);
+//        postCreds.put(USER_ID, userId);
+//        postCreds.put(POST_LIKES, postLikes);
+//        postCreds.put(POST_COMMENTS, postComments);
+//
+//        return postCreds;
+//    }
 
 
     public String getPostTitle() {
@@ -112,5 +121,31 @@ public class Posts {
 
     public void setPostComments(int postComments) {
         this.postComments = postComments;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
+
+    public void setAllPostsList(List<Posts> allPostsList) {
+        this.allPostsList = allPostsList;
+    }
+
+    public boolean isPostsListEmpty() {
+        if (allPostsList.size() > 0) return false;
+
+        return true;
+    }
+
+    public String getPostUser() {
+        return postUser;
+    }
+
+    public void setPostUser(String postUser) {
+        this.postUser = postUser;
     }
 }

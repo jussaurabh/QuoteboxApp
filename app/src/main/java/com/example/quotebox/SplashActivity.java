@@ -10,13 +10,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class SplashActivity extends AppCompatActivity {
 
-
-    private SharedPreferencesConfig preferencesConfig;
-
+    FirebaseAuth firebaseAuth;
     TextView splashScreenTag;
 
     @Override
@@ -24,7 +23,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        preferencesConfig = new SharedPreferencesConfig(getApplicationContext());
+        firebaseAuth = FirebaseAuth.getInstance();
 
         splashScreenTag = findViewById(R.id.splashScreenTag);
 
@@ -32,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
 
         splashScreenTag.startAnimation(fadeInAnime);
 
-        String msg = "login status " + preferencesConfig.getLoginStatus();
+        String msg = (firebaseAuth.getCurrentUser() != null) ? "true" : "false";
         Toast.makeText(SplashActivity.this, msg, Toast.LENGTH_LONG).show();
 
 
@@ -46,7 +45,7 @@ public class SplashActivity extends AppCompatActivity {
                 } finally {
                     finish();
 
-                    if (preferencesConfig.getLoginStatus()) {
+                    if (firebaseAuth.getCurrentUser() != null) {
                         startActivity(new Intent(SplashActivity.this, HomeActivity.class));
                     }
                     else {

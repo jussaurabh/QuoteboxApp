@@ -47,19 +47,19 @@ public class Users {
         this.noOfQuotesPosted = noOfQuotesPosted;
     }
     
-    public Map<String,Object> getUsersCreds() {
-        Map<String, Object> userData = new HashMap<>();
-        userData.put(USERNAME, username);
-        userData.put(EMAIL, email);
-        userData.put(PASSWORD, password);
-        userData.put(USERAVATAR, userAvatar);
-        userData.put(USERABOUTME, userAboutMe);
-        userData.put(USERDOB, userDOB);
-        userData.put(QUOTEPOSTLIKES, quotePostLikes);
-        userData.put(NOOFQUOTESPOSTED, noOfQuotesPosted);
-
-        return userData;
-    }
+//    public Map<String,Object> getUsersCreds() {
+//        Map<String, Object> userData = new HashMap<>();
+//        userData.put(USERNAME, username);
+//        userData.put(EMAIL, email);
+//        userData.put(PASSWORD, password);
+//        userData.put(USERAVATAR, userAvatar);
+//        userData.put(USERABOUTME, userAboutMe);
+//        userData.put(USERDOB, userDOB);
+//        userData.put(QUOTEPOSTLIKES, quotePostLikes);
+//        userData.put(NOOFQUOTESPOSTED, noOfQuotesPosted);
+//
+//        return userData;
+//    }
 
     public String getUsername() {
         return username;
@@ -109,11 +109,11 @@ public class Users {
         this.quotePostLikes = quotePostLikes;
     }
 
-    public int getNoOfQuotePosts() {
+    public int getNoOfQuotesPosted() {
         return noOfQuotesPosted;
     }
 
-    public void setNoOfQuotePosts(int noOfQuotesPosted) {
+    public void setNoOfQuotesPosted(int noOfQuotesPosted) {
         this.noOfQuotesPosted = noOfQuotesPosted;
     }
 
