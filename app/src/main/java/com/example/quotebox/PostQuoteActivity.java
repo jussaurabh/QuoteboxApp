@@ -41,6 +41,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+
 
 public class PostQuoteActivity extends AppCompatActivity {
 
@@ -173,7 +175,7 @@ public class PostQuoteActivity extends AppCompatActivity {
 
     public void insertPostToDatabase() {
 
-        Log.d("POST_QUOTE_ACTI_LOG ", "username :  " + preferencesConfig.getLoggedInUserCreds().get(Users.USERNAME));
+        HashMap<String, HashMap<String, String>> data = preferencesConfig.getLoggedInUserCreds();
 
         final Posts posts = new Posts(
                 postTitleEditText.getText().toString().trim(),
@@ -181,7 +183,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                 null,
                 getIntent().getStringExtra(Posts.POST_TYPE),
                 LOGGED_IN_USER_ID,
-                preferencesConfig.getLoggedInUserCreds().get(Users.USERNAME),
+                data.get(LOGGED_IN_USER_ID).get(Users.USERNAME),
                 0,
                 0
         );
@@ -208,7 +210,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                             posts.setPostImage(downloadUri.toString());
 
                             firestore.collection(collNames.getPostCollection())
-                                    .add(posts)
+                                    .add(posts.getPostsCreds())
                                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -229,7 +231,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         }
         else {
             firestore.collection(collNames.getPostCollection())
-                    .add(posts)
+                    .add(posts.getPostsCreds())
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {

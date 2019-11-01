@@ -53,18 +53,19 @@ public class Posts {
         this.postComments = postComments;
     }
 
-//    public Map<String, Object> getPostsCreds() {
-//        Map<String, Object> postCreds = new HashMap<>();
-//        postCreds.put(POST_TITLE, postTitle);
-//        postCreds.put(POST, post);
-//        postCreds.put(POST_IMAGE, postImage);
-//        postCreds.put(POST_TYPE, postType);
-//        postCreds.put(USER_ID, userId);
-//        postCreds.put(POST_LIKES, postLikes);
-//        postCreds.put(POST_COMMENTS, postComments);
-//
-//        return postCreds;
-//    }
+    public HashMap<String, String> getPostsCreds() {
+        HashMap<String, String> postCreds = new HashMap<>();
+        postCreds.put(POST_TITLE, postTitle);
+        postCreds.put(POST, post);
+        postCreds.put(POST_IMAGE, postImage);
+        postCreds.put(POST_TYPE, postType);
+        postCreds.put(USER_ID, userId);
+        postCreds.put(POST_USER, postUser);
+        postCreds.put(POST_LIKES, Integer.toString(postLikes));
+        postCreds.put(POST_COMMENTS, Integer.toString(postComments));
+
+        return postCreds;
+    }
 
 
     public String getPostTitle() {

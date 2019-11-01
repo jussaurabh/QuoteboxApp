@@ -1,11 +1,14 @@
 package com.example.quotebox.ui;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -32,6 +36,7 @@ public class HomeFragment extends Fragment {
 
     FirebaseFirestore firestore;
     private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//    List<HashMap<String, String>> postsList;
     List<Posts> postsList;
     Posts postAllData;
 
@@ -71,6 +76,8 @@ public class HomeFragment extends Fragment {
                                     posts.setPostUser(docs.getString(Posts.POST_USER));
                                     posts.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
                                     posts.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
+                                    posts.setUserId(docs.getString(Posts.USER_ID));
+                                    posts.setPostType(docs.getString(Posts.POST_TYPE));
 
                                     postsList.add(posts);
                                 }
@@ -94,6 +101,13 @@ public class HomeFragment extends Fragment {
         homeRecyclerView = view.findViewById(R.id.homeRecyclerView);
         homeRecyclerView.setHasFixedSize(true);
         homeRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
+//        collectionNamesDialog = new Dialog(view.getContext());
+//        collectionNamesDialog.setContentView(R.layout.collection_names_dialog);
+//        collectionNamesRL = collectionNamesDialog.findViewById(R.id.collectionNamesRL);
+//        createNewCollectionBtnTV = collectionNamesDialog.findViewById(R.id.createNewCollectionBtnTV);
+//        selectedCollectionSubmitBtn = collectionNamesDialog.findViewById(R.id.selectedCollectionSubmitBtn);
+
     }
 
     @Nullable
@@ -104,6 +118,9 @@ public class HomeFragment extends Fragment {
     }
 
 
+//    public void setPostAdapterToHomeFragment(PostsAdapter postAdapter) {
+//        homeRecyclerView.setAdapter(postAdapter);
+//    }
 
 
 }

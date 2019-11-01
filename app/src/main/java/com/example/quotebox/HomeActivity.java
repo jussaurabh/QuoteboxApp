@@ -8,14 +8,18 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.quotebox.adapters.PostsAdapter;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
@@ -34,9 +38,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,15 +55,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseFirestore firestore;
     Users users;
     CollectionNames collectionNames;
+    List<Posts> allPostsList;
+    PostsAdapter postsAdapter;
 
     private DrawerLayout drawerLayout;
 
+    RecyclerView homeRecyclerView;
     TextView nav_header_username, nav_header_email;
     ImageView nav_header_avatar;
     NavigationView navigationView;
     BottomNavigationView bottomNavigationView;
     FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab, storyPostFab;
     ConstraintLayout quoteFabWrapper, poemFabWrapper, storyFabWrapper;
+
+    Fragment homeFragment;
 
     boolean isFloatingBtnOpen = false;
 
@@ -71,6 +82,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         preferencesConfig = new SharedPreferencesConfig(getApplicationContext());
 
+        allPostsList = new ArrayList<>();
+
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
@@ -78,6 +91,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         users = new Users();
 
         getUserData();
+//        getAllAuthorPosts();
 
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         navigationView = findViewById(R.id.nav_view);
@@ -94,7 +108,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         quotePostFab = findViewById(R.id.quotePostFab);
         poemPostFab = findViewById(R.id.poemPostFab);
         storyPostFab = findViewById(R.id.storyPostFab);
-
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
@@ -123,8 +136,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 else {
                     hideFabBtn();
                 }
-
-
             }
         });
 
@@ -241,6 +252,34 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
     }
+
+//    public void getAllAuthorPosts() {
+//        firestore.collection(collectionNames.getPostCollection()).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful() && task.getResult() != null) {
+//                                for(QueryDocumentSnapshot docs : task.getResult()) {
+//                                    Posts posts = new Posts();
+//                                    posts.setPostImage(docs.getString(Posts.POST_IMAGE));
+//                                    posts.setPost(docs.getString(Posts.POST));
+//                                    posts.setPostTitle(docs.getString(Posts.POST_TITLE));
+//                                    posts.setPostUser(docs.getString(Posts.POST_USER));
+//                                    posts.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
+//                                    posts.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
+//
+//                                    allPostsList.add(posts);
+//                                }
+//
+//                                new Posts().setAllPostsList(allPostsList);
+//
+//                                Log.d("HOME_FRAGMENT_LOG", allPostsList.toString());
+//                                postsAdapter = new PostsAdapter(HomeActivity.this, allPostsList);
+//                                new HomeFragment().setPostAdapterToHomeFragment(postsAdapter);
+//                            }
+//                    }
+//                });
+//    }
 
 
     private void displayFabBtn() {

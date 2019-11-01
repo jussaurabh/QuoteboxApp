@@ -46,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     CollectionNames collectionNames;
 
-    private SharedPreferencesConfig preferencesConfig;
 
     TextView loginEmailErrMsg, loginPasswordErrMsg, loginErrorMsg;
     EditText loginEmailField, loginPasswordField;
@@ -60,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        preferencesConfig = new SharedPreferencesConfig(getApplicationContext());
         firestore = FirebaseFirestore.getInstance();
         collectionNames = new CollectionNames();
 
@@ -173,21 +171,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Log.d("LOGIN: ", "loginWithEmailAndPassword SUCCESS");
-
-                    firestore.collection(collectionNames.getUserCollection()).whereEqualTo(Users.EMAIL, email)
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d("LOGIN_LOG ", "USERNAME : " + task.getResult().getDocuments().get(0).getString(Users.USERNAME));
-                                        String uname = task.getResult().getDocuments().get(0).getString(Users.USERNAME);
-                                        preferencesConfig.setLoggedInUserCreds(uname);
-                                    }
-                                }
-                            });
-
-
 
                     finish();
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
