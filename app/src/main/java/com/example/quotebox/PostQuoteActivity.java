@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
@@ -51,6 +52,8 @@ public class PostQuoteActivity extends AppCompatActivity {
     StorageReference storageReference;
     CollectionNames collNames;
     SharedPreferencesConfig preferencesConfig;
+    GlobalClass globalClass;
+    Users loggedInUserData;
 
     private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -97,6 +100,8 @@ public class PostQuoteActivity extends AppCompatActivity {
         storageReference = firebaseStorage.getReference("uploads/" + POSTTYPE);
         collNames = new CollectionNames();
         preferencesConfig = new SharedPreferencesConfig(this);
+        globalClass = (GlobalClass) getApplicationContext();
+        loggedInUserData = globalClass.getLoggedInUserData();
 
         postDialog = new Dialog(this);
 
@@ -189,9 +194,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         );
 
         if (imgUri != null) {
-            final StorageReference fileRef = storageReference.child(
-                    System.currentTimeMillis() + "." +
-                            getFileExtension(imgUri));
+            final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
 
             fileRef.putFile(imgUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                     @Override
@@ -217,6 +220,25 @@ public class PostQuoteActivity extends AppCompatActivity {
                                             if (task.isSuccessful()) {
                                                 postProgressBar.setVisibility(View.GONE);
                                                 postSubmitBtn.setVisibility(View.VISIBLE);
+
+                                                switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
+                                                    case Posts.QUOTE_TYPE_POST: {
+                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                                .update(Users.NOOFQUOTESPOSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                        break;
+                                                    }
+                                                    case Posts.POEM_TYPE_POST: {
+                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                                .update(Users.NO_OF_POEM_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                        break;
+                                                    }
+                                                    case Posts.STORY_TYPE_POST: {
+                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                        break;
+                                                    }
+                                                }
+
                                                 finish();
                                                 startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
                                             }
@@ -238,6 +260,25 @@ public class PostQuoteActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 postProgressBar.setVisibility(View.GONE);
                                 postSubmitBtn.setVisibility(View.VISIBLE);
+
+                                switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
+                                    case Posts.QUOTE_TYPE_POST: {
+                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                .update(Users.NOOFQUOTESPOSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                        break;
+                                    }
+                                    case Posts.POEM_TYPE_POST: {
+                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                .update(Users.NO_OF_POEM_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                        break;
+                                    }
+                                    case Posts.STORY_TYPE_POST: {
+                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
+                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                        break;
+                                    }
+                                }
+
                                 finish();
                                 startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
                             }

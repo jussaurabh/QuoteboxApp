@@ -7,9 +7,9 @@ import java.util.Map;
 
 public class Posts {
 
-    public static final String QUOTE_TYPE_POST = "quote";
-    public static final String POEM_TYPE_POST = "poem";
-    public static final String STORY_TYPE_POST = "story";
+    public static final String QUOTE_TYPE_POST = "Quote";
+    public static final String POEM_TYPE_POST = "Poem";
+    public static final String STORY_TYPE_POST = "Story";
 
     // field names
     public static final String POST_TITLE = "postTitle";

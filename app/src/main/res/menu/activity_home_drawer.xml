@@ -8,6 +8,11 @@
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_power_settings_black"
             android:title="Logout" />
+
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings_black"
+            android:title="Settings"/>
 <!--        <item-->
 <!--            android:id="@+id/nav_gallery"-->
 <!--            android:icon="@drawable/ic_menu_gallery"-->

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="@color/whitesmoke"
+    android:background="@color/colorPrimary"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp"
@@ -21,13 +21,13 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/nunito"
         android:text="jussaurabh"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorWhite" />
 
     <TextView
         android:id="@+id/nav_header_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="saurabh@gmail.com"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorWhite" />
 
 </LinearLayout>

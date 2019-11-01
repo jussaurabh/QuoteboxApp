@@ -61,7 +61,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
         holder.authorPostTV.setText(postsList.get(position).getPost());
         holder.authorPostTitleTV.setText(postsList.get(position).getPostTitle());
-        holder.authorUsernameTV.setText(postsList.get(position).getPostUser());
+        holder.authorUsernameTV.setText("@"+ postsList.get(position).getPostUser());
         holder.authorNameTV.setText("- " + postsList.get(position).getPostUser());
         holder.commentCountTV.setText(Integer.toString(postsList.get(position).getPostComments()));
         holder.favoriteCountTV.setText(Integer.toString(postsList.get(position).getPostLikes()));

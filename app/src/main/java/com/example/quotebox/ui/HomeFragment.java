@@ -34,14 +34,14 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    FirebaseFirestore firestore;
+    private FirebaseFirestore firestore;
     private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 //    List<HashMap<String, String>> postsList;
-    List<Posts> postsList;
-    Posts postAllData;
+    private List<Posts> postsList;
+    private Posts postAllData;
 
-    PostsAdapter postsAdapter;
-    RecyclerView homeRecyclerView;
+    private PostsAdapter postsAdapter;
+    private RecyclerView homeRecyclerView;
 
 
     @Override
@@ -84,7 +84,6 @@ public class HomeFragment extends Fragment {
 
                                 postAllData.setAllPostsList(postsList);
 
-                                Log.d("HOME_FRAGMENT_LOG", postsList.toString());
                                 postsAdapter = new PostsAdapter(getActivity(), postsList);
                                 homeRecyclerView.setAdapter(postsAdapter);
                             }
@@ -117,10 +116,6 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-
-//    public void setPostAdapterToHomeFragment(PostsAdapter postAdapter) {
-//        homeRecyclerView.setAdapter(postAdapter);
-//    }
 
 
 }

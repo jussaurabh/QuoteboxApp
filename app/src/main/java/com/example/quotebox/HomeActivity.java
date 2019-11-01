@@ -8,21 +8,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.quotebox.adapters.PostsAdapter;
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.interfaces.QuotePostsListener;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.CollectionFragment;
@@ -53,14 +51,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore firestore;
-    Users users;
     CollectionNames collectionNames;
     List<Posts> allPostsList;
-    PostsAdapter postsAdapter;
+    GlobalClass globalClass;
+    QuotePostsListener quotePostsListener;
 
     private DrawerLayout drawerLayout;
-
-    RecyclerView homeRecyclerView;
+    Toolbar toolbar;
     TextView nav_header_username, nav_header_email;
     ImageView nav_header_avatar;
     NavigationView navigationView;
@@ -68,9 +65,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab, storyPostFab;
     ConstraintLayout quoteFabWrapper, poemFabWrapper, storyFabWrapper;
 
-    Fragment homeFragment;
-
-    boolean isFloatingBtnOpen = false;
 
 
     @Override
@@ -81,6 +75,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new HomeFragment()).commit();
 
         preferencesConfig = new SharedPreferencesConfig(getApplicationContext());
+        globalClass = (GlobalClass) getApplicationContext();
 
         allPostsList = new ArrayList<>();
 
@@ -88,10 +83,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         firebaseUser = firebaseAuth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
         collectionNames = new CollectionNames();
-        users = new Users();
 
         getUserData();
-//        getAllAuthorPosts();
 
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         navigationView = findViewById(R.id.nav_view);
@@ -112,7 +105,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_home);
 
@@ -143,7 +136,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 hideFabBtn();
-                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Quote"));
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, Posts.QUOTE_TYPE_POST));
             }
         });
 
@@ -151,7 +144,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 hideFabBtn();
-                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Poem"));
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, Posts.POEM_TYPE_POST));
             }
         });
 
@@ -159,7 +152,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 hideFabBtn();
-                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, "Story"));
+                startActivity(new Intent(HomeActivity.this, PostQuoteActivity.class).putExtra(Posts.POST_TYPE, Posts.STORY_TYPE_POST));
             }
         });
     }
@@ -199,18 +192,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             switch (menuItem.getItemId()) {
                 case R.id.bottom_nav_home: {
                     selectedFragment = new HomeFragment();
+                    toolbar.setTitle("Home");
                     break;
                 }
                 case R.id.bottom_nav_collection: {
                     selectedFragment = new CollectionFragment();
+                    toolbar.setTitle("Collections");
                     break;
                 }
                 case R.id.bottom_nav_notification: {
                     selectedFragment = new NotificationFragment();
+                    toolbar.setTitle("Notifications");
                     break;
                 }
                 case R.id.bottom_nav_account: {
                     selectedFragment = new ProfileFragment();
+                    toolbar.setTitle("Profile");
                     break;
                 }
             }
@@ -230,56 +227,63 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         List<DocumentSnapshot> userList = task.getResult().getDocuments();
 
-                        users = new Users(
-                                userList.get(0).getString(Users.USERNAME),
-                                userList.get(0).getString(Users.EMAIL),
-                                userList.get(0).getString(Users.PASSWORD),
-                                userList.get(0).getString(Users.USERAVATAR),
-                                userList.get(0).getString(Users.USERABOUTME),
-                                null,
-                                Integer.parseInt(userList.get(0).get(Users.QUOTEPOSTLIKES).toString()),
-                                Integer.parseInt(userList.get(0).get(Users.NOOFQUOTESPOSTED).toString())
-                        );
-
-                        nav_header_username.setText(users.getUsername());
-                        nav_header_email.setText(users.getEmail());
+                        nav_header_username.setText(userList.get(0).getString(Users.USERNAME));
+                        nav_header_email.setText(userList.get(0).getString(Users.EMAIL));
 
                         if (firebaseUser.getPhotoUrl() != null) {
                             Picasso.get().load(firebaseUser.getPhotoUrl())
                                     .transform(new ImageCircleTransform())
                                     .into(nav_header_avatar);
                         }
+
+                        Users userdata = new Users();
+                        userdata.setUsername(userList.get(0).getString(Users.USERNAME));
+                        userdata.setEmail(userList.get(0).getString(Users.EMAIL));
+                        userdata.setUserAvatar(userList.get(0).getString(Users.USERAVATAR));
+                        userdata.setUserAboutMe(userList.get(0).getString(Users.USERABOUTME));
+                        userdata.setQuotePostLikes(Integer.parseInt(userList.get(0).get(Users.QUOTEPOSTLIKES).toString()));
+                        userdata.setNoOfQuotesPosted(Integer.parseInt(userList.get(0).get(Users.NOOFQUOTESPOSTED).toString()));
+                        userdata.setNoOfStoryPosted(Integer.parseInt(userList.get(0).get(Users.NO_OF_STORY_POSTED).toString()));
+                        userdata.setNoOfPoemPosted(Integer.parseInt(userList.get(0).get(Users.NO_OF_POEM_POSTED).toString()));
+
+                        globalClass.setLoggedInUserData(userdata);
                     }
                 });
     }
 
-//    public void getAllAuthorPosts() {
-//        firestore.collection(collectionNames.getPostCollection()).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful() && task.getResult() != null) {
-//                                for(QueryDocumentSnapshot docs : task.getResult()) {
-//                                    Posts posts = new Posts();
-//                                    posts.setPostImage(docs.getString(Posts.POST_IMAGE));
-//                                    posts.setPost(docs.getString(Posts.POST));
-//                                    posts.setPostTitle(docs.getString(Posts.POST_TITLE));
-//                                    posts.setPostUser(docs.getString(Posts.POST_USER));
-//                                    posts.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
-//                                    posts.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
-//
-//                                    allPostsList.add(posts);
-//                                }
-//
-//                                new Posts().setAllPostsList(allPostsList);
-//
-//                                Log.d("HOME_FRAGMENT_LOG", allPostsList.toString());
-//                                postsAdapter = new PostsAdapter(HomeActivity.this, allPostsList);
-//                                new HomeFragment().setPostAdapterToHomeFragment(postsAdapter);
-//                            }
-//                    }
-//                });
-//    }
+
+    public void getLoggedInUserPosts() {
+        firestore.collection(collectionNames.getPostCollection())
+                .whereEqualTo(Posts.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        List<Posts> quotepostdata = new ArrayList<>();
+                        List<Posts> poempostdata = new ArrayList<>();
+                        List<Posts> storypostdata = new ArrayList<>();
+                        for (QueryDocumentSnapshot docs : task.getResult()) {
+                            Posts post = new Posts();
+                            post.setPostId(docs.getId());
+                            post.setPost(docs.getString(Posts.POST));
+                            post.setPostType(docs.getString(Posts.POST_TYPE));
+                            post.setPostTitle(docs.getString(Posts.POST_TITLE));
+                            post.setUserId(docs.getString(Posts.USER_ID));
+                            post.setPostUser(docs.getString(Posts.POST_USER));
+                            post.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
+                            post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
+
+                            if (docs.getString(Posts.POST_TYPE).equals(Posts.QUOTE_TYPE_POST)) {
+                                quotepostdata.add(post);
+                                quotePostsListener.setUserQuotePosts(quotepostdata, "samp quote");
+                            }
+                            if (docs.getString(Posts.POST_TYPE).equals(Posts.POEM_TYPE_POST)) poempostdata.add(post);
+                            if (docs.getString(Posts.POST_TYPE).equals(Posts.STORY_TYPE_POST)) storypostdata.add(post);
+
+                        }
+                    }
+                });
+    }
 
 
     private void displayFabBtn() {

@@ -3,7 +3,6 @@ package com.example.quotebox;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,7 +10,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -243,9 +241,6 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("SIGNUP : ", "createUserWithEmailAndPassword SUCCESS USER_ID : " + task.getResult().getUser().getUid());
-
-
 
                             // setting the default value at user register/signup
                             Users users = new Users(
@@ -255,6 +250,8 @@ public class SignupActivity extends AppCompatActivity {
                                     null,
                                     null,
                                     null,
+                                    0,
+                                    0,
                                     0,
                                     0
                             );
@@ -267,7 +264,10 @@ public class SignupActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             signupSubmitBtn.setVisibility(View.VISIBLE);
                                             signupProgressBar.setVisibility(View.GONE);
-                                            resetSignupPage();
+//                                            resetSignupPage();
+
+                                            finish();
+                                            startActivity(new Intent(SignupActivity.this, HomeActivity.class));
                                         }
                                     });
                         }
@@ -293,20 +293,20 @@ public class SignupActivity extends AppCompatActivity {
         t.setVisibility(View.VISIBLE);
     }
 
-    public void resetSignupPage() {
-        signupUsernameField.setText("");
-        signupEmailField.setText("");
-        signupPasswordField.setText("");
-
-        signupUsernameCheckImageView.setVisibility(View.GONE);
-        signupShowPwdCheckBox.setChecked(false);
-
-        View view = this.getCurrentFocus();
-        if(view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
+//    public void resetSignupPage() {
+//        signupUsernameField.setText("");
+//        signupEmailField.setText("");
+//        signupPasswordField.setText("");
+//
+//        signupUsernameCheckImageView.setVisibility(View.GONE);
+//        signupShowPwdCheckBox.setChecked(false);
+//
+//        View view = this.getCurrentFocus();
+//        if(view != null) {
+//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//        }
+//    }
 
     public void goToLoginActivity(View view) {
         startActivity(new Intent(SignupActivity.this, LoginActivity.class));

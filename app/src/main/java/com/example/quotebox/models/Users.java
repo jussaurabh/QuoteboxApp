@@ -15,7 +15,9 @@ public class Users {
     public static final String USERDOB = "userDOB";
     public static final String QUOTEPOSTLIKES = "quotePostLikes";
     public static final String NOOFQUOTESPOSTED = "noOfQuotesPosted";
-    
+    public static final String NO_OF_POEM_POSTED = "noOfPoemPosted";
+    public static final String NO_OF_STORY_POSTED = "noOfStoryPosted";
+
 
     private String username;
     private String email;
@@ -25,6 +27,8 @@ public class Users {
     private Date userDOB;
     private int quotePostLikes;
     private int noOfQuotesPosted;
+    private int noOfPoemPosted;
+    private int noOfStoryPosted;
 
     public Users() {
 
@@ -37,7 +41,9 @@ public class Users {
                  String userAboutMe,
                  Date userDOB,
                  int quotePostLikes,
-                 int noOfQuotesPosted) {
+                 int noOfQuotesPosted,
+                 int noOfPoemPosted,
+                 int noOfStoryPosted) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -46,6 +52,8 @@ public class Users {
         this.userDOB = userDOB;
         this.quotePostLikes = quotePostLikes;
         this.noOfQuotesPosted = noOfQuotesPosted;
+        this.noOfPoemPosted = noOfPoemPosted;
+        this.noOfStoryPosted = noOfStoryPosted;
     }
     
 //    public Map<String,Object> getUsersCreds() {
@@ -124,5 +132,21 @@ public class Users {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getNoOfPoemPosted() {
+        return noOfPoemPosted;
+    }
+
+    public void setNoOfPoemPosted(int noOfPoemPosted) {
+        this.noOfPoemPosted = noOfPoemPosted;
+    }
+
+    public int getNoOfStoryPosted() {
+        return noOfStoryPosted;
+    }
+
+    public void setNoOfStoryPosted(int noOfStoryPosted) {
+        this.noOfStoryPosted = noOfStoryPosted;
     }
 }
