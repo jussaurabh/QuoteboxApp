@@ -18,6 +18,7 @@ import com.example.quotebox.HomeActivity;
 import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.adapters.PostsAdapter;
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.interfaces.PoemPostsListener;
 import com.example.quotebox.models.Posts;
 
@@ -29,11 +30,14 @@ public class ProfilePoemFragment extends Fragment {
     private Button goToWritePoemBtn;
     private RecyclerView poemSecRV;
     private PostsAdapter postsAdapter;
+    private GlobalClass globalClass;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.frame_profile_poem_section, container, false);;
+
+        globalClass = (GlobalClass) getActivity().getApplicationContext();
 
         poemSecPlaceholderLL = view.findViewById(R.id.poemSecPlaceholderLL);
         goToWritePoemBtn = view.findViewById(R.id.goToWritePoemBtn);
@@ -48,7 +52,7 @@ public class ProfilePoemFragment extends Fragment {
             }
         });
 
-        ((HomeActivity) view.getContext()).passPoemPosts(new PoemPostsListener() {
+        globalClass.passPoemPosts(new PoemPostsListener() {
             @Override
             public void setUserPoemPosts(List<Posts> p) {
                 if (p.size() > 0) {

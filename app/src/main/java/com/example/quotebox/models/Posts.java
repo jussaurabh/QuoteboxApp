@@ -1,5 +1,8 @@
 package com.example.quotebox.models;
 
+
+import com.google.firebase.Timestamp;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,7 @@ public class Posts {
     public static final String USER_ID = "userId";
     public static final String POST_LIKES = "postLikes";
     public static final String POST_COMMENTS = "postComments";
+    public static final String POST_TIMESTAMP = "postTimestamp";
 
     private String postId;
     private String postTitle;
@@ -31,7 +35,7 @@ public class Posts {
     private String userId;
     private int postLikes;
     private int postComments;
-    private List<Posts> allPostsList = new ArrayList<>();
+    private Timestamp postTimestamp;
 
     public Posts() {}
 
@@ -51,20 +55,6 @@ public class Posts {
         this.postUser = postUser;
         this.postLikes = postLikes;
         this.postComments = postComments;
-    }
-
-    public HashMap<String, String> getPostsCreds() {
-        HashMap<String, String> postCreds = new HashMap<>();
-        postCreds.put(POST_TITLE, postTitle);
-        postCreds.put(POST, post);
-        postCreds.put(POST_IMAGE, postImage);
-        postCreds.put(POST_TYPE, postType);
-        postCreds.put(USER_ID, userId);
-        postCreds.put(POST_USER, postUser);
-        postCreds.put(POST_LIKES, Integer.toString(postLikes));
-        postCreds.put(POST_COMMENTS, Integer.toString(postComments));
-
-        return postCreds;
     }
 
 
@@ -132,21 +122,19 @@ public class Posts {
         this.postId = postId;
     }
 
-    public void setAllPostsList(List<Posts> allPostsList) {
-        this.allPostsList = allPostsList;
-    }
-
-    public boolean isPostsListEmpty() {
-        if (allPostsList.size() > 0) return false;
-
-        return true;
-    }
-
     public String getPostUser() {
         return postUser;
     }
 
     public void setPostUser(String postUser) {
         this.postUser = postUser;
+    }
+
+    public Timestamp getPostTimestamp() {
+        return postTimestamp;
+    }
+
+    public void setPostTimestamp(Timestamp postTimestamp) {
+        this.postTimestamp = postTimestamp;
     }
 }

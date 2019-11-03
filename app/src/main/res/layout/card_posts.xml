@@ -74,7 +74,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/nunito"
-                            android:text="johnwick" />
+                            android:text="johnwick"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                         <ImageButton
                             android:id="@+id/imageButton"

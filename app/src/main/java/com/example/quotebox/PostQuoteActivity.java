@@ -31,9 +31,11 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -184,16 +186,24 @@ public class PostQuoteActivity extends AppCompatActivity {
         HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
         final String LOGGED_IN_USER_ID = firebaseUser.getUid();
 
-        final Posts posts = new Posts(
-                postTitleEditText.getText().toString().trim(),
-                postEditText.getText().toString().trim(),
-                null,
-                getIntent().getStringExtra(Posts.POST_TYPE),
-                LOGGED_IN_USER_ID,
-                data.get(LOGGED_IN_USER_ID).getUsername(),
-                0,
-                0
-        );
+//        final Posts posts = new Posts(
+//                postTitleEditText.getText().toString().trim(),
+//                postEditText.getText().toString().trim(),
+//                null,
+//                getIntent().getStringExtra(Posts.POST_TYPE),
+//                LOGGED_IN_USER_ID,
+//                data.get(LOGGED_IN_USER_ID).getUsername(),
+//                0,
+//                0
+//        );
+
+        final Posts post = new Posts();
+        post.setPostTitle(postTitleEditText.getText().toString().trim());
+        post.setPost(postEditText.getText().toString().trim());
+        post.setPostType(getIntent().getStringExtra(Posts.POST_TYPE));
+        post.setUserId(LOGGED_IN_USER_ID);
+        post.setPostUser(data.get(LOGGED_IN_USER_ID).getUsername());
+        post.setPostTimestamp(Timestamp.now());
 
         if (imgUri != null) {
             final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
@@ -211,10 +221,10 @@ public class PostQuoteActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
 
-                            posts.setPostImage(downloadUri.toString());
+                            post.setPostImage(downloadUri.toString());
 
                             firestore.collection(collNames.getPostCollection())
-                                    .add(posts.getPostsCreds())
+                                    .add(post)
                                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -254,7 +264,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         }
         else {
             firestore.collection(collNames.getPostCollection())
-                    .add(posts.getPostsCreds())
+                    .add(post)
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {

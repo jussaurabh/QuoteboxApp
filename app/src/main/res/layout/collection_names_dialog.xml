@@ -58,13 +58,6 @@
         android:paddingStart="15dp"
         android:paddingEnd="15dp">
 
-        <TextView
-            android:id="@+id/testText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collectionNamesRL"
             android:layout_width="match_parent"

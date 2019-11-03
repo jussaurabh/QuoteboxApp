@@ -13,7 +13,7 @@ public class Users {
     public static final String USERAVATAR = "userAvatar";
     public static final String USERABOUTME = "userAboutMe";
     public static final String USERDOB = "userDOB";
-    public static final String QUOTEPOSTLIKES = "quotePostLikes";
+    public static final String POST_LIKES = "postLikes";
     public static final String NO_OF_QUOTES_POSTED = "noOfQuotesPosted";
     public static final String NO_OF_POEM_POSTED = "noOfPoemPosted";
     public static final String NO_OF_STORY_POSTED = "noOfStoryPosted";
@@ -55,20 +55,6 @@ public class Users {
         this.noOfPoemPosted = noOfPoemPosted;
         this.noOfStoryPosted = noOfStoryPosted;
     }
-    
-//    public Map<String,Object> getUsersCreds() {
-//        Map<String, Object> userData = new HashMap<>();
-//        userData.put(USERNAME, username);
-//        userData.put(EMAIL, email);
-//        userData.put(PASSWORD, password);
-//        userData.put(USERAVATAR, userAvatar);
-//        userData.put(USERABOUTME, userAboutMe);
-//        userData.put(USERDOB, userDOB);
-//        userData.put(QUOTEPOSTLIKES, quotePostLikes);
-//        userData.put(NO_OF_QUOTES_POSTED, noOfQuotesPosted);
-//
-//        return userData;
-//    }
 
     public String getUsername() {
         return username;

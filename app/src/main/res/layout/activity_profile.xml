@@ -4,10 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    android:orientation="vertical"
+    tools:context=".ProfileActivity" >
 
-    <TextView
+    <include
+        layout="@layout/quotebox_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Profile Page"/>
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:id="@+id/profileActivityFL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
 </LinearLayout>

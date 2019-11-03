@@ -18,25 +18,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quotebox.R;
 import com.example.quotebox.globals.GlobalClass;
-import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 
 public class ProfileFragment extends Fragment {
 
@@ -45,24 +37,23 @@ public class ProfileFragment extends Fragment {
     private SharedPreferencesConfig preferencesConfig;
     private GlobalClass globalClass;
 
-    private static final FirebaseUser LOGGED_IN_USER = FirebaseAuth.getInstance().getCurrentUser();
-
     private ImageView userProfileAvatarIV;
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
     private Button followUserBtn, followingUserBtn, userQuoteCountBtn, userPoemCountBtn, userStoryCountBtn;
     private ProgressBar followUserProgressBar;
-    private LinearLayout userAboutWrapperLL;
+    private LinearLayout userAboutWrapperLL, userFollowBtnWrapperLL;
 
+
+    @Nullable
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.frame_profile, container, false);
 
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
         firestore = FirebaseFirestore.getInstance();
         preferencesConfig = new SharedPreferencesConfig(view.getContext());
         globalClass = (GlobalClass) getActivity().getApplicationContext();
-//        globalClass = (GlobalClass) view.getContext();
         Users loggedInUserData = globalClass.getLoggedInUserData();
 
         Gson gson = new Gson();
@@ -75,6 +66,7 @@ public class ProfileFragment extends Fragment {
         userLikesCountTV = view.findViewById(R.id.userLikesCountTV);
         userAboutTV = view.findViewById(R.id.userAboutTV);
         userAboutWrapperLL = view.findViewById(R.id.userAboutWrapperLL);
+        userFollowBtnWrapperLL = view.findViewById(R.id.userFollowBtnWrapperLL);
 //        followingUserBtn = view.findViewById(R.id.followingUserBtn);
 //        followUserBtn = view.findViewById(R.id.followUserBtn);
         userQuoteCountBtn = view.findViewById(R.id.userQuoteCountBtn);
@@ -114,12 +106,6 @@ public class ProfileFragment extends Fragment {
                 togglePostFragment(Posts.STORY_TYPE_POST);
             }
         });
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.frame_profile, container, false);
 
         return view;
     }
@@ -167,7 +153,6 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-//        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
     }
 

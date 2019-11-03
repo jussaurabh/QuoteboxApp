@@ -1,5 +1,6 @@
 package com.example.quotebox.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.example.quotebox.HomeActivity;
 import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.adapters.PostsAdapter;
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.interfaces.QuotePostsListener;
 import com.example.quotebox.models.Posts;
 
@@ -30,11 +32,14 @@ public class ProfileQuoteFragment extends Fragment {
     private RecyclerView quoteSecRV;
     private Button goToWriteQuoteBtn;
     private PostsAdapter postsAdapter;
+    private GlobalClass globalClass;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.frame_profile_quote_section, container, false);
+
+        globalClass = (GlobalClass) getActivity().getApplicationContext();
 
         quoteSecPlaceholderLL = view.findViewById(R.id.quoteSecPlaceholderLL);
         quoteSecRV = view.findViewById(R.id.quoteSecRV);
@@ -49,7 +54,8 @@ public class ProfileQuoteFragment extends Fragment {
             }
         });
 
-        ((HomeActivity) view.getContext()).passQuotePosts(new QuotePostsListener() {
+//        ((HomeActivity) view.getContext()).passQuotePosts(new QuotePostsListener() {
+        globalClass.passQuotePosts(new QuotePostsListener() {
             @Override
             public void setUserQuotePosts(List<Posts> p) {
                 if (p.size() > 0) {

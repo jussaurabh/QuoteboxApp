@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
@@ -50,9 +51,9 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private QuotePostsListener quotePostsListener;
-    private PoemPostsListener poemPostsListener;
-    private StoryPostsListener storyPostsListener;
+//    private QuotePostsListener quotePostsListener;
+//    private PoemPostsListener poemPostsListener;
+//    private StoryPostsListener storyPostsListener;
 
     private SharedPreferencesConfig preferencesConfig;
 
@@ -95,7 +96,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         collectionNames = new CollectionNames();
 
         getUserData();
-        getLoggedInUserPosts();
+        globalClass.setLoggedInUserPosts();
 
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         navigationView = findViewById(R.id.nav_view);
@@ -255,37 +256,38 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    public void getLoggedInUserPosts() {
-        firestore.collection(collectionNames.getPostCollection())
-                .whereEqualTo(Posts.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        quotepostdata = new ArrayList<>();
-                        poempostdata = new ArrayList<>();
-                        storypostdata = new ArrayList<>();
-                        for (QueryDocumentSnapshot docs : task.getResult()) {
-                            Posts post = new Posts();
-                            post.setPostId(docs.getId());
-                            post.setPost(docs.getString(Posts.POST));
-                            post.setPostImage(docs.getString(Posts.POST_IMAGE));
-                            post.setPostType(docs.getString(Posts.POST_TYPE));
-                            post.setPostTitle(docs.getString(Posts.POST_TITLE));
-                            post.setUserId(docs.getString(Posts.USER_ID));
-                            post.setPostUser(docs.getString(Posts.POST_USER));
-                            post.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
-                            post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
-
-                            if (docs.getString(Posts.POST_TYPE).equals(Posts.QUOTE_TYPE_POST)) quotepostdata.add(post);
-                            if (docs.getString(Posts.POST_TYPE).equals(Posts.POEM_TYPE_POST)) poempostdata.add(post);
-                            if (docs.getString(Posts.POST_TYPE).equals(Posts.STORY_TYPE_POST)) storypostdata.add(post);
-
-                        }
-
-                    }
-                });
-    }
+//    public void getLoggedInUserPosts() {
+//        firestore.collection(collectionNames.getPostCollection())
+//                .whereEqualTo(Posts.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        quotepostdata = new ArrayList<>();
+//                        poempostdata = new ArrayList<>();
+//                        storypostdata = new ArrayList<>();
+//                        for (QueryDocumentSnapshot docs : task.getResult()) {
+//                            Posts post = new Posts();
+//                            post.setPostId(docs.getId());
+//                            post.setPost(docs.getString(Posts.POST));
+//                            post.setPostImage(docs.getString(Posts.POST_IMAGE));
+//                            post.setPostType(docs.getString(Posts.POST_TYPE));
+//                            post.setPostTitle(docs.getString(Posts.POST_TITLE));
+//                            post.setUserId(docs.getString(Posts.USER_ID));
+//                            post.setPostUser(docs.getString(Posts.POST_USER));
+//                            post.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
+//                            post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
+//                            post.setPostTimestamp(docs.getTimestamp(Posts.POST_TIMESTAMP));
+//
+//                            if (docs.getString(Posts.POST_TYPE).equals(Posts.QUOTE_TYPE_POST)) quotepostdata.add(post);
+//                            if (docs.getString(Posts.POST_TYPE).equals(Posts.POEM_TYPE_POST)) poempostdata.add(post);
+//                            if (docs.getString(Posts.POST_TYPE).equals(Posts.STORY_TYPE_POST)) storypostdata.add(post);
+//
+//                        }
+//
+//                    }
+//                });
+//    }
 
 
     private void displayFabBtn() {
@@ -303,18 +305,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    public void passQuotePosts(QuotePostsListener qpl) {
-        this.quotePostsListener = qpl;
-        quotePostsListener.setUserQuotePosts(quotepostdata);
-    }
+//    public void passQuotePosts(QuotePostsListener qpl) {
+//        this.quotePostsListener = qpl;
+//        quotePostsListener.setUserQuotePosts(quotepostdata);
+//    }
+//
+//    public void passPoemPosts(PoemPostsListener ppl) {
+//        this.poemPostsListener = ppl;
+//        poemPostsListener.setUserPoemPosts(poempostdata);
+//    }
+//
+//    public void passStoryPosts(StoryPostsListener spl) {
+//        this.storyPostsListener = spl;
+//        storyPostsListener.setUserStoryPosts(storypostdata);
+//    }
 
-    public void passPoemPosts(PoemPostsListener ppl) {
-        this.poemPostsListener = ppl;
-        poemPostsListener.setUserPoemPosts(poempostdata);
-    }
-
-    public void passStoryPosts(StoryPostsListener spl) {
-        this.storyPostsListener = spl;
-        storyPostsListener.setUserStoryPosts(storypostdata);
-    }
 }

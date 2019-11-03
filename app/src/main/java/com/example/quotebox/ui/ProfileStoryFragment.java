@@ -18,6 +18,7 @@ import com.example.quotebox.HomeActivity;
 import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.adapters.PostsAdapter;
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.interfaces.StoryPostsListener;
 import com.example.quotebox.models.Posts;
 
@@ -29,12 +30,15 @@ public class ProfileStoryFragment extends Fragment {
     private RecyclerView storySecRV;
     private Button goToWriteStoryBtn;
     private PostsAdapter postsAdapter;
+    private GlobalClass globalClass;
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.frame_profile_story_section, container, false);
+
+        globalClass = (GlobalClass) getActivity().getApplicationContext();
 
         storySecPlaceholderLL = view.findViewById(R.id.storySecPlaceholderLL);
         storySecRV = view.findViewById(R.id.storySecRV);
@@ -49,7 +53,7 @@ public class ProfileStoryFragment extends Fragment {
             }
         });
 
-        ((HomeActivity) view.getContext()).passStoryPosts(new StoryPostsListener() {
+        globalClass.passStoryPosts(new StoryPostsListener() {
             @Override
             public void setUserStoryPosts(List<Posts> p) {
                 if (p.size() > 0) {
