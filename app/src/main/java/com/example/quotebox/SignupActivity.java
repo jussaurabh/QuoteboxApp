@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.quotebox.helpers.CollectionNames;
+import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,7 +29,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -38,6 +41,7 @@ public class SignupActivity extends AppCompatActivity {
     FirebaseFirestore firestore;
     CollectionNames collectionNames;
     Users users;
+    SharedPreferencesConfig preferencesConfig;
 
     EditText signupUsernameField, signupEmailField, signupPasswordField;
     Button signupSubmitBtn;
@@ -55,6 +59,7 @@ public class SignupActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
         collectionNames = new CollectionNames();
         users = new Users();
+        preferencesConfig = new SharedPreferencesConfig(this);
 
         signupUsernameField = findViewById(R.id.signupUsernameField);
         signupEmailField = findViewById(R.id.signupEmailField);
@@ -241,7 +246,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
+                            final String signUpUserId = task.getResult().getUser().getUid();
                             // setting the default value at user register/signup
                             Users users = new Users(
                                     username,
@@ -257,14 +262,22 @@ public class SignupActivity extends AppCompatActivity {
                             );
 
                             firestore.collection(collectionNames.getUserCollection())
-                                    .document(task.getResult().getUser().getUid())
+                                    .document(signUpUserId)
                                     .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             signupSubmitBtn.setVisibility(View.VISIBLE);
                                             signupProgressBar.setVisibility(View.GONE);
-//                                            resetSignupPage();
+
+                                            HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
+                                            if (!data.containsKey(signUpUserId)) {
+                                                Users userData = new Users();
+                                                userData.setUsername(username);
+                                                userData.setUserAvatar(null);
+                                                data.put(signUpUserId, userData);
+                                                preferencesConfig.setAllUserCreds(new Gson().toJson(data));
+                                            }
 
                                             finish();
                                             startActivity(new Intent(SignupActivity.this, HomeActivity.class));
@@ -293,20 +306,6 @@ public class SignupActivity extends AppCompatActivity {
         t.setVisibility(View.VISIBLE);
     }
 
-//    public void resetSignupPage() {
-//        signupUsernameField.setText("");
-//        signupEmailField.setText("");
-//        signupPasswordField.setText("");
-//
-//        signupUsernameCheckImageView.setVisibility(View.GONE);
-//        signupShowPwdCheckBox.setChecked(false);
-//
-//        View view = this.getCurrentFocus();
-//        if(view != null) {
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-//        }
-//    }
 
     public void goToLoginActivity(View view) {
         startActivity(new Intent(SignupActivity.this, LoginActivity.class));

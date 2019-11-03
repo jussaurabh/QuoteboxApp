@@ -4,6 +4,6 @@ import com.example.quotebox.models.Posts;
 
 import java.util.List;
 
-public interface QuotePostsListener {
-    void setUserQuotePosts(List<Posts> p);
+public interface PoemPostsListener {
+    void setUserPoemPosts(List<Posts> p);
 }

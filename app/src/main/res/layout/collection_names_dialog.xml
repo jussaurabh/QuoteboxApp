@@ -12,57 +12,65 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
             android:paddingStart="15dp"
-            android:paddingTop="15dp"
             android:paddingEnd="15dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="false"
+                android:layout_weight="13"
                 android:fontFamily="@font/nunito"
+                android:gravity="center_vertical"
                 android:text="Save to..."
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/createNewCollectionBtnTV"
+            <Button
+                android:id="@+id/createNewCollectionBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:fontFamily="@font/nunito_bold"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:fontFamily="@font/nunito_semibold"
                 android:text="+ New Collection"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="@color/blue"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textAlignment="textEnd"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/blue" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <View
-            android:id="@+id/divider2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="15dp"
             android:background="@color/gray" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp">
+
+        <TextView
+            android:id="@+id/testText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collectionNamesRL"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -71,7 +79,6 @@
         android:orientation="vertical">
 
         <View
-            android:id="@+id/divider3"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_weight="1"

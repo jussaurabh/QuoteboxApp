@@ -33,6 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -56,12 +57,16 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
+        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
         firestore = FirebaseFirestore.getInstance();
         preferencesConfig = new SharedPreferencesConfig(view.getContext());
         globalClass = (GlobalClass) getActivity().getApplicationContext();
+//        globalClass = (GlobalClass) view.getContext();
         Users loggedInUserData = globalClass.getLoggedInUserData();
+
+        Gson gson = new Gson();
+        Log.d("PROFILE_FRAG", "loggedin user data : " + gson.toJson(loggedInUserData));
 
         userProfileAvatarIV = view.findViewById(R.id.userProfileAvatarIV);
         userProfileAuthornameTV = view.findViewById(R.id.userProfileAuthornameTV);
@@ -70,12 +75,12 @@ public class ProfileFragment extends Fragment {
         userLikesCountTV = view.findViewById(R.id.userLikesCountTV);
         userAboutTV = view.findViewById(R.id.userAboutTV);
         userAboutWrapperLL = view.findViewById(R.id.userAboutWrapperLL);
-        followingUserBtn = view.findViewById(R.id.followingUserBtn);
-        followUserBtn = view.findViewById(R.id.followUserBtn);
+//        followingUserBtn = view.findViewById(R.id.followingUserBtn);
+//        followUserBtn = view.findViewById(R.id.followUserBtn);
         userQuoteCountBtn = view.findViewById(R.id.userQuoteCountBtn);
         userPoemCountBtn = view.findViewById(R.id.userPoemCountBtn);
         userStoryCountBtn = view.findViewById(R.id.userStoryCountBtn);
-        followUserProgressBar = view.findViewById(R.id.followUserProgressBar);
+//        followUserProgressBar = view.findViewById(R.id.followUserProgressBar);
 
         userProfileAuthornameTV.setText(loggedInUserData.getUsername());
         userQuoteCountBtn.setText(loggedInUserData.getNoOfQuotesPosted() + " Quote");
@@ -114,7 +119,9 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frame_profile, container, false);
+        View view = inflater.inflate(R.layout.frame_profile, container, false);
+
+        return view;
     }
 
 
@@ -160,7 +167,8 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        getFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
+//        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
+        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
     }
 
 }

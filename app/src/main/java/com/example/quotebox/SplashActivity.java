@@ -31,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
     FirebaseFirestore firestore;
     TextView splashScreenTag;
     SharedPreferencesConfig preferencesConfig;
-    HashMap<String, HashMap<String, String>> allUsersData;
+    HashMap<String, Users> allUsersData;
 
 
     @Override
@@ -55,19 +55,20 @@ public class SplashActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                HashMap<String, String> data = new HashMap<>();
-                                data.put(Users.USERAVATAR, doc.getString(Users.USERAVATAR));
-                                data.put(Users.USERNAME, doc.getString(Users.USERNAME));
+//                                HashMap<String, String> data = new HashMap<>();
+//                                data.put(Users.USERAVATAR, doc.getString(Users.USERAVATAR));
+//                                data.put(Users.USERNAME, doc.getString(Users.USERNAME));
 
+                                Users data = new Users();
+                                data.setUserAvatar(doc.getString(Users.USERAVATAR));
+                                data.setUsername(doc.getString(Users.USERNAME));
                                 allUsersData.put(doc.getId(), data);
 
-                                Log.d("SPLASH_ACTIVITY_LOG", allUsersData.toString());
                             }
 
-                            Gson gson = new Gson();
-                            String jsonData = gson.toJson(allUsersData);
-                            Log.d("SPLASH_ACTIVITY", jsonData);
-                            preferencesConfig.setLoggedInUserCreds(jsonData);
+                            String jsonData = new Gson().toJson(allUsersData);
+                            Log.d("SPLASH_ACT_LOG", "all user creds: " + jsonData);
+                            preferencesConfig.setAllUserCreds(jsonData);
 
                         }
                     }

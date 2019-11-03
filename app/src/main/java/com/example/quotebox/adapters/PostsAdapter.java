@@ -3,9 +3,11 @@ package com.example.quotebox.adapters;
 import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,7 +21,6 @@ import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -32,10 +33,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
     SharedPreferencesConfig preferencesConfig;
 
+    TextView testText;
     RecyclerView collectionNamesRL;
-    TextView createNewCollectionBtnTV;
     Dialog collectionNamesDialog;
-    Button selectedCollectionSubmitBtn;
+    Button selectedCollectionSubmitBtn, createNewCollectionBtn;
 
     public PostsAdapter(Context context, List<Posts> posts) {
         this.context = context;
@@ -46,13 +47,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     @Override
     public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         preferencesConfig = new SharedPreferencesConfig(this.context);
-        Log.d("PA_LOG", preferencesConfig.getLoggedInUserCreds().toString());
-        Log.d("PA_ALL_POSTS", new Gson().toJson(postsList));
+//        Log.d("PA_LOG", preferencesConfig.getAllUserCreds().toString());
+        Log.d("PA_ALL_POSTS", postsList.toString());
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PostsViewHolder holder, final int position) {
 
         if (postsList.get(position).getPostImage() != null) {
             holder.cardPostImageIV.setVisibility(View.VISIBLE);
@@ -66,23 +67,39 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         holder.commentCountTV.setText(Integer.toString(postsList.get(position).getPostComments()));
         holder.favoriteCountTV.setText(Integer.toString(postsList.get(position).getPostLikes()));
 
-        HashMap<String, HashMap<String, String>> data = preferencesConfig.getLoggedInUserCreds();
-        Log.d("PA_POST_USERID", postsList.get(position).getUserId());
-        Log.d("PA_HAS_USERID", data.containsKey(postsList.get(position).getUserId()) ? "true" : "false");
+        HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
 
-        if (data.get(postsList.get(position).getUserId()).get(Users.USERAVATAR) != null) {
-            Log.d("POST_ADAPTER_HASHMAP", data.get(postsList.get(position).getUserId()).toString());
-            Log.d("POST_A_USER IMAGE", data.get(postsList.get(position).getUserId()).get(Users.USERAVATAR));
-            Picasso.get().load(data.get(postsList.get(position).getUserId()).get(Users.USERAVATAR))
+        if (data.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
+            Picasso.get().load(data.get(postsList.get(position).getUserId()).getUserAvatar())
                     .transform(new ImageCircleTransform())
                     .into(holder.authorAvatarIV);
         }
 
 
+        holder.collectionAddImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                collectionNamesDialog = new Dialog(context);
+                collectionNamesDialog.setContentView(R.layout.collection_names_dialog);
+                collectionNamesDialog.getWindow().setGravity(Gravity.BOTTOM);
+                collectionNamesDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
-//        Picasso.get().load(R.mipmap.ic_avatar_placeholder_round)
-//                .transform(new ImageCircleTransform())
-//                .into(holder.authorAvatarIV);
+                selectedCollectionSubmitBtn = collectionNamesDialog.findViewById(R.id.selectedCollectionSubmitBtn);
+                createNewCollectionBtn = collectionNamesDialog.findViewById(R.id.createNewCollectionBtn);
+                testText = collectionNamesDialog.findViewById(R.id.testText);
+
+                testText.setText(postsList.get(position).getPost());
+
+                selectedCollectionSubmitBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        collectionNamesDialog.cancel();
+                    }
+                });
+
+                collectionNamesDialog.show();
+            }
+        });
     }
 
     @Override

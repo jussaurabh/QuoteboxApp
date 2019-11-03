@@ -42,5 +42,13 @@
         android:id="@+id/storySecRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignTop="@+id/storySecPlaceholderLL"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="50dp"
         android:visibility="invisible" />
 </RelativeLayout>

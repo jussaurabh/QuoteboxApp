@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.example.quotebox.R;
 import com.example.quotebox.models.Users;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SharedPreferencesConfig {
 
@@ -45,23 +42,15 @@ public class SharedPreferencesConfig {
         return status;
     }
 
-    public void setLoggedInUserCreds(String data) {
+    public void setAllUserCreds(String data) {
         Log.d("SHARED_PREF_LOG", "username form setLoggedInUSerCreds: " + data);
         editor.putString(LOGIN_USER_DATA_PREF, data);
         editor.commit();
     }
 
-//    public HashMap<String, String> getLoggedInUserCreds() {
-//        HashMap<String, String> userCreds = new HashMap<>();
-//
-//        Log.d("SHARED_PREF_LOG", "USERNAME : " + sharedPreferences.getString(LOGIN_USERNAME_PREF, ""));
-//        userCreds.put(Users.USERNAME, sharedPreferences.getString(LOGIN_USERNAME_PREF, ""));
-//        return userCreds;
-//    }
-
-    public HashMap<String, HashMap<String, String>> getLoggedInUserCreds() {
+    public HashMap<String, Users> getAllUserCreds() {
         Gson gson = new Gson();
-        Type type = new TypeToken<HashMap<String, HashMap<String, String>>>(){}.getType();
+        Type type = new TypeToken<HashMap<String, Users>>(){}.getType();
 
         return gson.fromJson(
                 sharedPreferences.getString(LOGIN_USER_DATA_PREF, ""),

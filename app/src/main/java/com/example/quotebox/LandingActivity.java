@@ -7,12 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.quotebox.helpers.SharedPreferencesConfig;
-
 
 public class LandingActivity extends AppCompatActivity {
-
-    private SharedPreferencesConfig preferencesConfig;
 
     Button goToSignupActivityBtn, goToLoginActivityBtn;
 
@@ -22,11 +18,9 @@ public class LandingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-        preferencesConfig = new SharedPreferencesConfig(getApplicationContext());
 
         goToSignupActivityBtn = findViewById(R.id.goToSignupActivityBtn);
         goToLoginActivityBtn = findViewById(R.id.goToLoginActivityBtn);
-
 
         goToLoginActivityBtn.setOnClickListener(new View.OnClickListener() {
             @Override

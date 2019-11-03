@@ -6,9 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
@@ -35,6 +32,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -48,6 +46,7 @@ import java.util.HashMap;
 public class PostQuoteActivity extends AppCompatActivity {
 
     FirebaseFirestore firestore;
+    FirebaseUser firebaseUser;
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
     CollectionNames collNames;
@@ -55,7 +54,7 @@ public class PostQuoteActivity extends AppCompatActivity {
     GlobalClass globalClass;
     Users loggedInUserData;
 
-    private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//    private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private static final int PICK_IMAGE_REQUEST = 1;
     
     Toolbar toolbar;
@@ -96,6 +95,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         final String POSTTYPE = getIntent().getStringExtra(Posts.POST_TYPE);
 
         firestore = FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference("uploads/" + POSTTYPE);
         collNames = new CollectionNames();
@@ -180,7 +180,9 @@ public class PostQuoteActivity extends AppCompatActivity {
 
     public void insertPostToDatabase() {
 
-        HashMap<String, HashMap<String, String>> data = preferencesConfig.getLoggedInUserCreds();
+        // returns all users credentials
+        HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
+        final String LOGGED_IN_USER_ID = firebaseUser.getUid();
 
         final Posts posts = new Posts(
                 postTitleEditText.getText().toString().trim(),
@@ -188,7 +190,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                 null,
                 getIntent().getStringExtra(Posts.POST_TYPE),
                 LOGGED_IN_USER_ID,
-                data.get(LOGGED_IN_USER_ID).get(Users.USERNAME),
+                data.get(LOGGED_IN_USER_ID).getUsername(),
                 0,
                 0
         );
@@ -200,7 +202,6 @@ public class PostQuoteActivity extends AppCompatActivity {
                     @Override
                     public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                         if (!task.isSuccessful()) throw task.getException();
-
                         return fileRef.getDownloadUrl();
                     }
                 })
@@ -224,7 +225,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                                                 switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
                                                     case Posts.QUOTE_TYPE_POST: {
                                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NOOFQUOTESPOSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                                .update(Users.NO_OF_QUOTES_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
                                                         break;
                                                     }
                                                     case Posts.POEM_TYPE_POST: {
@@ -264,7 +265,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                                 switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
                                     case Posts.QUOTE_TYPE_POST: {
                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NOOFQUOTESPOSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                .update(Users.NO_OF_QUOTES_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
                                         break;
                                     }
                                     case Posts.POEM_TYPE_POST: {
@@ -295,4 +296,6 @@ public class PostQuoteActivity extends AppCompatActivity {
                     });
         }
     }
+
+
 }

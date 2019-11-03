@@ -35,6 +35,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
+
+import java.util.HashMap;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -45,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     ProgressBar loginProgressBar,loginWithGoogleProgressBar;
     GoogleSignInClient mGoogleSignInClient;
     CollectionNames collectionNames;
+    SharedPreferencesConfig preferencesConfig;
 
 
     TextView loginEmailErrMsg, loginPasswordErrMsg, loginErrorMsg;
@@ -61,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
         firestore = FirebaseFirestore.getInstance();
         collectionNames = new CollectionNames();
+        preferencesConfig = new SharedPreferencesConfig(this);
 
         loginEmailField = findViewById(R.id.loginEmailField);
         loginPasswordField = findViewById(R.id.loginPasswordField);
@@ -252,8 +257,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("LOGIN_TAG", "LOGIN SUCCESS");
-
+                            final String gLoginUserId = task.getResult().getUser().getUid();
                             Users users = new Users(
                                     account.getEmail().split("@")[0],
                                     account.getEmail(),
@@ -268,7 +272,7 @@ public class LoginActivity extends AppCompatActivity {
                             );
 
                             firestore.collection(collectionNames.getUserCollection())
-                                    .document(task.getResult().getUser().getUid())
+                                    .document(gLoginUserId)
                                     .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
@@ -276,6 +280,16 @@ public class LoginActivity extends AppCompatActivity {
                                             Toast.makeText(LoginActivity.this, "LOGIN SUCCESS ", Toast.LENGTH_SHORT).show();
                                             loginWithGoogleBtn.setVisibility(View.VISIBLE);
                                             loginWithGoogleProgressBar.setVisibility(View.GONE);
+
+                                            HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
+                                            if (!data.containsKey(gLoginUserId)) {
+                                                Users userData = new Users();
+                                                userData.setUsername(account.getEmail().split("@")[0]);
+                                                userData.setUserAvatar(null);
+                                                data.put(gLoginUserId, userData);
+                                                preferencesConfig.setAllUserCreds(new Gson().toJson(data));
+                                            }
+
                                             finish();
                                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                         }

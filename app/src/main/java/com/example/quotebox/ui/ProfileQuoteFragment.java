@@ -12,34 +12,34 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quotebox.HomeActivity;
 import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.R;
+import com.example.quotebox.adapters.PostsAdapter;
 import com.example.quotebox.interfaces.QuotePostsListener;
 import com.example.quotebox.models.Posts;
 
 import java.util.List;
 
-public class ProfileQuoteFragment extends Fragment implements QuotePostsListener {
+public class ProfileQuoteFragment extends Fragment {
 
     private LinearLayout quoteSecPlaceholderLL;
     private RecyclerView quoteSecRV;
     private Button goToWriteQuoteBtn;
-    private List<Posts> quotePostList;
+    private PostsAdapter postsAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frame_profile_quote_section, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        final View view = inflater.inflate(R.layout.frame_profile_quote_section, container, false);
 
         quoteSecPlaceholderLL = view.findViewById(R.id.quoteSecPlaceholderLL);
         quoteSecRV = view.findViewById(R.id.quoteSecRV);
+        quoteSecRV.setHasFixedSize(true);
+        quoteSecRV.setLayoutManager(new LinearLayoutManager(view.getContext()));
         goToWriteQuoteBtn = view.findViewById(R.id.goToWriteQuoteBtn);
 
         goToWriteQuoteBtn.setOnClickListener(new View.OnClickListener() {
@@ -48,12 +48,21 @@ public class ProfileQuoteFragment extends Fragment implements QuotePostsListener
                 startActivity(new Intent(view.getContext(), PostQuoteActivity.class).putExtra(Posts.POST_TYPE, Posts.QUOTE_TYPE_POST));
             }
         });
+
+        ((HomeActivity) view.getContext()).passQuotePosts(new QuotePostsListener() {
+            @Override
+            public void setUserQuotePosts(List<Posts> p) {
+                if (p.size() > 0) {
+                    quoteSecPlaceholderLL.setVisibility(View.GONE);
+                    quoteSecRV.setVisibility(View.VISIBLE);
+                    postsAdapter = new PostsAdapter(view.getContext(), p);
+                    quoteSecRV.setAdapter(postsAdapter);
+                }
+            }
+        });
+
+        return view;
     }
 
-    @Override
-    public void setUserQuotePosts(List<Posts> p, String s) {
-        quotePostList = p;
-        Log.d("QUOTE_FRAG", "quote posts: " + quotePostList.toString());
-        goToWriteQuoteBtn.setText(s);
-    }
+
 }

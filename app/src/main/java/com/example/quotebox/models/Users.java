@@ -14,7 +14,7 @@ public class Users {
     public static final String USERABOUTME = "userAboutMe";
     public static final String USERDOB = "userDOB";
     public static final String QUOTEPOSTLIKES = "quotePostLikes";
-    public static final String NOOFQUOTESPOSTED = "noOfQuotesPosted";
+    public static final String NO_OF_QUOTES_POSTED = "noOfQuotesPosted";
     public static final String NO_OF_POEM_POSTED = "noOfPoemPosted";
     public static final String NO_OF_STORY_POSTED = "noOfStoryPosted";
 
@@ -65,7 +65,7 @@ public class Users {
 //        userData.put(USERABOUTME, userAboutMe);
 //        userData.put(USERDOB, userDOB);
 //        userData.put(QUOTEPOSTLIKES, quotePostLikes);
-//        userData.put(NOOFQUOTESPOSTED, noOfQuotesPosted);
+//        userData.put(NO_OF_QUOTES_POSTED, noOfQuotesPosted);
 //
 //        return userData;
 //    }

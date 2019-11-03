@@ -14,19 +14,26 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quotebox.HomeActivity;
 import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.R;
+import com.example.quotebox.adapters.PostsAdapter;
+import com.example.quotebox.interfaces.PoemPostsListener;
 import com.example.quotebox.models.Posts;
+
+import java.util.List;
 
 public class ProfilePoemFragment extends Fragment {
 
     private LinearLayout poemSecPlaceholderLL;
     private Button goToWritePoemBtn;
     private RecyclerView poemSecRV;
+    private PostsAdapter postsAdapter;
 
+    @Nullable
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.frame_profile_poem_section, container, false);;
 
         poemSecPlaceholderLL = view.findViewById(R.id.poemSecPlaceholderLL);
         goToWritePoemBtn = view.findViewById(R.id.goToWritePoemBtn);
@@ -41,11 +48,18 @@ public class ProfilePoemFragment extends Fragment {
             }
         });
 
-    }
+        ((HomeActivity) view.getContext()).passPoemPosts(new PoemPostsListener() {
+            @Override
+            public void setUserPoemPosts(List<Posts> p) {
+                if (p.size() > 0) {
+                    poemSecPlaceholderLL.setVisibility(View.GONE);
+                    poemSecRV.setVisibility(View.VISIBLE);
+                    postsAdapter = new PostsAdapter(view.getContext(), p);
+                    poemSecRV.setAdapter(postsAdapter);
+                }
+            }
+        });
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frame_profile_poem_section, container, false);
+        return view;
     }
 }
