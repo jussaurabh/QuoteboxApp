@@ -32,12 +32,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -256,44 +259,56 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
                             final String gLoginUserId = task.getResult().getUser().getUid();
-                            Users users = new Users(
-                                    account.getEmail().split("@")[0],
-                                    account.getEmail(),
-                                    "",
-                                    account.getPhotoUrl().toString(),
-                                    null,
-                                    null,
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                            );
+
 
                             firestore.collection(collectionNames.getUserCollection())
-                                    .document(gLoginUserId)
-                                    .set(users)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    .whereEqualTo(Users.EMAIL, account.getEmail())
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Toast.makeText(LoginActivity.this, "LOGIN SUCCESS ", Toast.LENGTH_SHORT).show();
-                                            loginWithGoogleBtn.setVisibility(View.VISIBLE);
-                                            loginWithGoogleProgressBar.setVisibility(View.GONE);
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.getResult() != null && task.getResult().size() > 0) {
+                                                finish();
+                                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
-                                            HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
-                                            if (!data.containsKey(gLoginUserId)) {
-                                                Users userData = new Users();
-                                                userData.setUsername(account.getEmail().split("@")[0]);
-                                                userData.setUserAvatar(null);
-                                                data.put(gLoginUserId, userData);
-                                                preferencesConfig.setAllUserCreds(new Gson().toJson(data));
+                                                loginWithGoogleBtn.setVisibility(View.VISIBLE);
+                                                loginWithGoogleProgressBar.setVisibility(View.GONE);
                                             }
+                                            else {
+                                                Users users = new Users(
+                                                        account.getEmail().split("@")[0],
+                                                        account.getEmail(),
+                                                        "",
+                                                        account.getPhotoUrl().toString(),
+                                                        null,
+                                                        null,
+                                                        new ArrayList<String>(),
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0,
+                                                        0
+                                                );
 
-                                            finish();
-                                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                                                firestore.collection(collectionNames.getUserCollection())
+                                                        .document(gLoginUserId)
+                                                        .set(users)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                Toast.makeText(LoginActivity.this, "LOGIN SUCCESS ", Toast.LENGTH_SHORT).show();
+                                                                finish();
+                                                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                                                                loginWithGoogleBtn.setVisibility(View.VISIBLE);
+                                                                loginWithGoogleProgressBar.setVisibility(View.GONE);
+                                                            }
+                                                        });
+                                            }
                                         }
                                     });
+
                         }
                         else {
                             Log.d("LOGIN_TAG", "LOGIN ERROR" + task.getException());

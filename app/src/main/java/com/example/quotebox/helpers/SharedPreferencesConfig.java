@@ -31,32 +31,22 @@ public class SharedPreferencesConfig {
     }
 
 
-    public void setLoginStatus(boolean status) {
-        editor.putBoolean(LOGIN_SHARED_PREF, status);
-        editor.commit();
-    }
-
-    public boolean getLoginStatus() {
-        boolean status;
-        status = sharedPreferences.getBoolean(LOGIN_STATUS_PREF, false);
-        return status;
-    }
-
-    public void setAllUserCreds(String data) {
-        Log.d("SHARED_PREF_LOG", "username form setLoggedInUSerCreds: " + data);
-        editor.putString(LOGIN_USER_DATA_PREF, data);
-        editor.commit();
-    }
-
-    public HashMap<String, Users> getAllUserCreds() {
-        Gson gson = new Gson();
-        Type type = new TypeToken<HashMap<String, Users>>(){}.getType();
-
-        return gson.fromJson(
-                sharedPreferences.getString(LOGIN_USER_DATA_PREF, ""),
-                type
-        );
-
-    }
+//    public void setLoggedInUserCreds(Users user) {
+//        String data = new Gson().toJson(user);
+//        Log.d("SHARED_PREF_LOG", "username form setLoggedInUSerCreds: " + data);
+//        editor.putString(LOGIN_USER_DATA_PREF, data);
+//        editor.commit();
+//    }
+//
+//    public Users getLoggedInUserCreds() {
+//        Gson gson = new Gson();
+//        Type type = new TypeToken<Users>(){}.getType();
+//
+//        return gson.fromJson(
+//                sharedPreferences.getString(LOGIN_USER_DATA_PREF, ""),
+//                type
+//        );
+//
+//    }
 
 }

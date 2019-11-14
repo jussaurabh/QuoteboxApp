@@ -1,6 +1,7 @@
 package com.example.quotebox.globals;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -16,8 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GlobalClass extends Application {
@@ -29,7 +32,11 @@ public class GlobalClass extends Application {
     private boolean isUserLoggedIn = false;
     private Users loggedInUserData;
     private List<Posts> quotepostdata, poempostdata, storypostdata;
+    private HashMap<String, Users> allUsers = new HashMap<>();
+
     private FirebaseFirestore firestore;
+
+
 
     public boolean isUserLoggedIn() {
         return isUserLoggedIn;
@@ -93,10 +100,10 @@ public class GlobalClass extends Application {
         return 0;
     }
 
-    public void setLoggedInUserPosts() {
+    public void setSelectedUserPosts(String userid) {
         firestore = FirebaseFirestore.getInstance();
         firestore.collection(new CollectionNames().getPostCollection())
-                .whereEqualTo(Posts.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .whereEqualTo(Posts.USER_ID, userid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -127,6 +134,14 @@ public class GlobalClass extends Application {
                 });
     }
 
+    public List<Posts> getQuotePostData() {return quotepostdata;}
+
+    public List<Posts> getPoemPostData() {return poempostdata;}
+
+    public List<Posts> getStoryPostData() {
+        return storypostdata;
+    }
+
     public void passQuotePosts(QuotePostsListener qpl) {
         this.quotePostsListener = qpl;
         quotePostsListener.setUserQuotePosts(quotepostdata);
@@ -140,5 +155,31 @@ public class GlobalClass extends Application {
     public void passStoryPosts(StoryPostsListener spl) {
         this.storyPostsListener = spl;
         storyPostsListener.setUserStoryPosts(storypostdata);
+    }
+
+
+    public void setAllUsersData() {
+        firestore = FirebaseFirestore.getInstance();
+        firestore.collection(new CollectionNames().getUserCollection()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (QueryDocumentSnapshot doc : task.getResult()) {
+                            Users user = new Users();
+
+                            user.setUsername(doc.getString(Users.USERNAME));
+                            user.setUserAvatar(doc.getString(Users.USERAVATAR));
+                            user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
+
+                            allUsers.put(doc.getId(), user);
+                        }
+
+                        Log.d("GLOBAL_LOG", new Gson().toJson(allUsers));
+                    }
+                });
+    }
+
+    public HashMap<String, Users> getAllUsersData() {
+        return allUsers;
     }
 }

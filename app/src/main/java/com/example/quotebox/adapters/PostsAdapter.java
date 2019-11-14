@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +24,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.quotebox.HomeActivity;
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
+import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
+import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.ProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -43,9 +55,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     Context context;
     List<Posts> postsList;
 
+    FirebaseFirestore firestore;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
-    CollectionNamesAdapter collectionNamesAdapter;
+    CollectionDialogAdapter collectionDialogAdapter;
+    PostController postController;
 
     RecyclerView collectionNamesRL;
     Dialog collectionNamesDialog;
@@ -59,16 +73,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     @NonNull
     @Override
     public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        firestore = FirebaseFirestore.getInstance();
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
+        postController= new PostController();
 
-//        Log.d("PA_LOG", preferencesConfig.getAllUserCreds().toString());
         Log.d("PA_ALL_POSTS", postsList.toString());
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostsViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final PostsViewHolder holder, final int position) {
+
+        final HashMap<String, Users> data = globalClass.getAllUsersData();
+        final Users loggedInUserData = globalClass.getLoggedInUserData();
+        final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String postid = postsList.get(position).getPostId();
+        final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
 
         Date d = new Date(postsList.get(position).getPostTimestamp().getSeconds() * 1000);
         DateFormat dateFormat = new SimpleDateFormat("MMM d, ''yy");
@@ -86,7 +108,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         holder.favoriteCountTV.setText(Integer.toString(postsList.get(position).getPostLikes()));
         holder.postDateTV.setText(dateFormat.format(d));
 
-        HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
 
         if (data.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
             Picasso.get().load(data.get(postsList.get(position).getUserId()).getUserAvatar())
@@ -94,7 +115,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                     .into(holder.authorAvatarIV);
         }
 
-        final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
         holder.authorUsernameTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +133,62 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                 }
             }
         });
+
+        holder.favoriteImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
+                holder.favoriteImageBtn.setVisibility(View.GONE);
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), true)
+                        .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
+                            @Override
+                            public void onPostLikeUpdate(int postLikeCount) {
+                                holder.postFavBtnProgressBar.setVisibility(View.GONE);
+                                holder.unFavoriteIB.setVisibility(View.VISIBLE);
+
+                                holder.favoriteCountTV.setText(Integer.toString(postLikeCount));
+
+                                if (!data.get(userid).getFavPosts().contains(postid)) {
+                                    data.get(userid).getFavPosts().add(postid);
+                                }
+
+                                loggedInUserData.getFavPosts().add(postid);
+                            }
+                        });
+            }
+        });
+
+        holder.unFavoriteIB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
+                holder.unFavoriteIB.setVisibility(View.GONE);
+
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), false)
+                        .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
+                            @Override
+                            public void onPostLikeUpdate(int postLikeCount) {
+                                holder.postFavBtnProgressBar.setVisibility(View.GONE);
+                                holder.favoriteImageBtn.setVisibility(View.VISIBLE);
+
+                                holder.favoriteCountTV.setText(Integer.toString(postLikeCount));
+
+                                loggedInUserData.getFavPosts().remove(postid);
+
+                                if (data.get(userid).getFavPosts().contains(postid)) {
+                                    data.get(userid).getFavPosts().remove(postid);
+                                }
+                            }
+                        });
+            }
+        });
+
+
+        if (data.get(userid).getFavPosts().contains(postsList.get(position).getPostId())) {
+            holder.favoriteImageBtn.setVisibility(View.GONE);
+            holder.unFavoriteIB.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -123,17 +199,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     class PostsViewHolder extends RecyclerView.ViewHolder {
 
         ImageView authorAvatarIV, cardPostImageIV;
-        ImageButton favoriteImageButton, commentImageButton, collectionAddImageButton;
+        ImageButton favoriteImageBtn, unFavoriteIB, commentImageBtn, collectionAddImageBtn;
         TextView authorPostTitleTV, authorUsernameTV, authorPostTV, authorNameTV, favoriteCountTV, commentCountTV, postDateTV;
+        ProgressBar postFavBtnProgressBar;
 
         public PostsViewHolder(@NonNull View itemView) {
             super(itemView);
 
             authorAvatarIV = itemView.findViewById(R.id.author_avatar);
             cardPostImageIV = itemView.findViewById(R.id.cardPostImageIV);
-            favoriteImageButton = itemView.findViewById(R.id.favoriteImageButton);
-            commentImageButton = itemView.findViewById(R.id.commentImageButton);
-            collectionAddImageButton = itemView.findViewById(R.id.collectionAddImageButton);
+            favoriteImageBtn = itemView.findViewById(R.id.favoriteImageButton);
+            unFavoriteIB = itemView.findViewById(R.id.unFavoriteIB);
+            commentImageBtn = itemView.findViewById(R.id.commentImageButton);
+            collectionAddImageBtn = itemView.findViewById(R.id.collectionAddImageButton);
             authorPostTitleTV = itemView.findViewById(R.id.author_post_title_name);
             authorUsernameTV = itemView.findViewById(R.id.author_username);
             authorPostTV = itemView.findViewById(R.id.author_post);
@@ -141,8 +219,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             favoriteCountTV = itemView.findViewById(R.id.favoriteCountTV);
             commentCountTV = itemView.findViewById(R.id.commentCountTV);
             postDateTV = itemView.findViewById(R.id.postDateTV);
+            postFavBtnProgressBar = itemView.findViewById(R.id.postFavBtnPB);
 
-            collectionAddImageButton.setOnClickListener(new View.OnClickListener() {
+
+            collectionAddImageBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     collectionNamesDialog = new Dialog(view.getContext());
@@ -164,18 +244,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
                     Log.d("POST_ADAP", "collec name : " + pcl.toString());
 
-                    collectionNamesAdapter = new CollectionNamesAdapter(view.getContext(), pcl);
-                    collectionNamesRL.setAdapter(collectionNamesAdapter);
 
-                    selectedCollectionSubmitBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            collectionNamesDialog.cancel();
-                        }
-                    });
+//                    collectionDialogAdapter = new CollectionDialogAdapter(pcl, this);
+//                    collectionNamesRL.setAdapter(collectionNamesAdapter);
+
+//                    selectedCollectionSubmitBtn.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            collectionNamesDialog.cancel();
+//                        }
+//                    });
 
                 }
             });
+
+
 
 
         }

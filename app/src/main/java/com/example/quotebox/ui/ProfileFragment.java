@@ -29,18 +29,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.util.Locale;
+
 
 public class ProfileFragment extends Fragment {
 
     private FirebaseFirestore firestore;
     private Users userPostDetails;
-    private SharedPreferencesConfig preferencesConfig;
     private GlobalClass globalClass;
 
     private ImageView userProfileAvatarIV;
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
-    private Button followUserBtn, followingUserBtn, userQuoteCountBtn, userPoemCountBtn, userStoryCountBtn;
-    private ProgressBar followUserProgressBar;
+    private Button userQuoteCountBtn, userPoemCountBtn, userStoryCountBtn;
     private LinearLayout userAboutWrapperLL, userFollowBtnWrapperLL;
 
 
@@ -52,12 +52,8 @@ public class ProfileFragment extends Fragment {
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
         firestore = FirebaseFirestore.getInstance();
-        preferencesConfig = new SharedPreferencesConfig(view.getContext());
         globalClass = (GlobalClass) getActivity().getApplicationContext();
         Users loggedInUserData = globalClass.getLoggedInUserData();
-
-        Gson gson = new Gson();
-        Log.d("PROFILE_FRAG", "loggedin user data : " + gson.toJson(loggedInUserData));
 
         userProfileAvatarIV = view.findViewById(R.id.userProfileAvatarIV);
         userProfileAuthornameTV = view.findViewById(R.id.userProfileAuthornameTV);
@@ -67,17 +63,23 @@ public class ProfileFragment extends Fragment {
         userAboutTV = view.findViewById(R.id.userAboutTV);
         userAboutWrapperLL = view.findViewById(R.id.userAboutWrapperLL);
         userFollowBtnWrapperLL = view.findViewById(R.id.userFollowBtnWrapperLL);
-//        followingUserBtn = view.findViewById(R.id.followingUserBtn);
-//        followUserBtn = view.findViewById(R.id.followUserBtn);
         userQuoteCountBtn = view.findViewById(R.id.userQuoteCountBtn);
         userPoemCountBtn = view.findViewById(R.id.userPoemCountBtn);
         userStoryCountBtn = view.findViewById(R.id.userStoryCountBtn);
-//        followUserProgressBar = view.findViewById(R.id.followUserProgressBar);
 
         userProfileAuthornameTV.setText(loggedInUserData.getUsername());
-        userQuoteCountBtn.setText(loggedInUserData.getNoOfQuotesPosted() + " Quote");
-        userPoemCountBtn.setText(loggedInUserData.getNoOfPoemPosted() + " Poem");
-        userStoryCountBtn.setText(loggedInUserData.getNoOfStoryPosted() + " Story");
+
+        userFollowerCountTV.setText(String.valueOf(loggedInUserData.getFollowersCount()));
+        userFollowingsCountTV.setText(String.valueOf(loggedInUserData.getFollowingsCount()));
+        userLikesCountTV.setText(String.valueOf(loggedInUserData.getFavPosts().size()));
+
+        String poemCount = String.format(Locale.getDefault(), "Poems (%d)", loggedInUserData.getNoOfPoemPosted());
+        String quoteCount = String.format(Locale.getDefault(), "Quotes (%d)", loggedInUserData.getNoOfQuotesPosted());
+        String storyCount = String.format(Locale.getDefault(), "Stories (%d)", loggedInUserData.getNoOfStoryPosted());
+
+        userQuoteCountBtn.setText(quoteCount);
+        userPoemCountBtn.setText(poemCount);
+        userStoryCountBtn.setText(storyCount);
 
         if (loggedInUserData.getUserAvatar() != null) {
             Picasso.get().load(loggedInUserData.getUserAvatar())

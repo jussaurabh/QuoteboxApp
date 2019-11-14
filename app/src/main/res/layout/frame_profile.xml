@@ -22,7 +22,7 @@
             <ImageView
                 android:id="@+id/userProfileAvatarIV"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:paddingTop="40dp"
                 android:paddingBottom="40dp"
                 android:src="@mipmap/ic_avatar_placeholder_round" />
@@ -146,41 +146,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/userFollowBtnWrapperLL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="35dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/followUserBtn"
-                style="@style/transparentButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/dark_solid_border"
-                android:fontFamily="@font/nunito_semibold"
-                android:text="Follow"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <Button
-                android:id="@+id/followingUserBtn"
-                style="@style/darkButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/nunito_semibold"
-                android:text="Following"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:visibility="gone" />
-
-            <ProgressBar
-                android:id="@+id/followUserProgressBar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/userAboutWrapperLL"

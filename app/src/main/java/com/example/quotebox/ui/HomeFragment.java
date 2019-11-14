@@ -17,10 +17,12 @@ import com.example.quotebox.R;
 import com.example.quotebox.adapters.PostsAdapter;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.models.Posts;
+import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
@@ -47,14 +49,12 @@ public class HomeFragment extends Fragment {
         postsList = new ArrayList<>();
 
         firestore.collection(new CollectionNames().getPostCollection())
+                .orderBy(Posts.POST_TIMESTAMP, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-//                            List<Posts> allposts = task.getResult().toObjects(Posts.class);
-//                            Log.d("HOME_FRG", "all posts: " + allposts.toString());
-//                            Log.d("HOME_FRG", "all posts in json: " + new Gson().toJson(allposts));
 
                             if (task.getResult().size() > 0) {
                                 for(QueryDocumentSnapshot docs : task.getResult()) {

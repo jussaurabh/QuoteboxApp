@@ -183,26 +183,14 @@ public class PostQuoteActivity extends AppCompatActivity {
     public void insertPostToDatabase() {
 
         // returns all users credentials
-        HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
         final String LOGGED_IN_USER_ID = firebaseUser.getUid();
-
-//        final Posts posts = new Posts(
-//                postTitleEditText.getText().toString().trim(),
-//                postEditText.getText().toString().trim(),
-//                null,
-//                getIntent().getStringExtra(Posts.POST_TYPE),
-//                LOGGED_IN_USER_ID,
-//                data.get(LOGGED_IN_USER_ID).getUsername(),
-//                0,
-//                0
-//        );
 
         final Posts post = new Posts();
         post.setPostTitle(postTitleEditText.getText().toString().trim());
         post.setPost(postEditText.getText().toString().trim());
         post.setPostType(getIntent().getStringExtra(Posts.POST_TYPE));
         post.setUserId(LOGGED_IN_USER_ID);
-        post.setPostUser(data.get(LOGGED_IN_USER_ID).getUsername());
+        post.setPostUser(globalClass.getLoggedInUserData().getUsername());
         post.setPostTimestamp(Timestamp.now());
 
         if (imgUri != null) {
@@ -235,17 +223,18 @@ public class PostQuoteActivity extends AppCompatActivity {
                                                 switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
                                                     case Posts.QUOTE_TYPE_POST: {
                                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_QUOTES_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                                .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
                                                         break;
                                                     }
                                                     case Posts.POEM_TYPE_POST: {
                                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_POEM_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                                .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
                                                         break;
                                                     }
                                                     case Posts.STORY_TYPE_POST: {
                                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                                .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
+//                                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
                                                         break;
                                                     }
                                                 }
@@ -275,17 +264,17 @@ public class PostQuoteActivity extends AppCompatActivity {
                                 switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
                                     case Posts.QUOTE_TYPE_POST: {
                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_QUOTES_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
                                         break;
                                     }
                                     case Posts.POEM_TYPE_POST: {
                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_POEM_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
                                         break;
                                     }
                                     case Posts.STORY_TYPE_POST: {
                                         firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
+                                                .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
                                         break;
                                     }
                                 }

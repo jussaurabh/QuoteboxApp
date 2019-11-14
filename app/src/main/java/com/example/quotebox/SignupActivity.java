@@ -19,8 +19,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quotebox.controllers.AuthController;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.interfaces.OnSignupSuccessListener;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,6 +45,7 @@ public class SignupActivity extends AppCompatActivity {
     CollectionNames collectionNames;
     Users users;
     SharedPreferencesConfig preferencesConfig;
+    AuthController authController;
 
     EditText signupUsernameField, signupEmailField, signupPasswordField;
     Button signupSubmitBtn;
@@ -60,6 +64,7 @@ public class SignupActivity extends AppCompatActivity {
         collectionNames = new CollectionNames();
         users = new Users();
         preferencesConfig = new SharedPreferencesConfig(this);
+        authController = new AuthController();
 
         signupUsernameField = findViewById(R.id.signupUsernameField);
         signupEmailField = findViewById(R.id.signupEmailField);
@@ -218,7 +223,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    public void createNewUser(final String username, final String email, final String password) {
+    public void createNewUser(String username, String email, String password) {
 
         signupSubmitBtn.setVisibility(View.GONE);
         signupProgressBar.setVisibility(View.VISIBLE);
@@ -241,58 +246,28 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        authController.signup(this, username, email, password)
+                .addOnSignupSuccessListener(new OnSignupSuccessListener() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            final String signUpUserId = task.getResult().getUser().getUid();
-                            // setting the default value at user register/signup
-                            Users users = new Users(
-                                    username,
-                                    email,
-                                    password,
-                                    null,
-                                    null,
-                                    null,
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                            );
+                    public void onSignupSuccess(String uid, Users user) {
+                        if (user != null) {
+                            signupSubmitBtn.setVisibility(View.VISIBLE);
+                            signupProgressBar.setVisibility(View.GONE);
 
-                            firestore.collection(collectionNames.getUserCollection())
-                                    .document(signUpUserId)
-                                    .set(users)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            signupSubmitBtn.setVisibility(View.VISIBLE);
-                                            signupProgressBar.setVisibility(View.GONE);
-
-                                            HashMap<String, Users> data = preferencesConfig.getAllUserCreds();
-                                            if (!data.containsKey(signUpUserId)) {
-                                                Users userData = new Users();
-                                                userData.setUsername(username);
-                                                userData.setUserAvatar(null);
-                                                data.put(signUpUserId, userData);
-                                                preferencesConfig.setAllUserCreds(new Gson().toJson(data));
-                                            }
-
-                                            finish();
-                                            startActivity(new Intent(SignupActivity.this, HomeActivity.class));
-                                        }
-                                    });
+                            finish();
+                            startActivity(new Intent(SignupActivity.this, HomeActivity.class));
                         }
                         else {
-                            Log.d("SIGNUP: ", "ERROR in createUserWithEmailAndPassword", task.getException());
                             Toast.makeText(SignupActivity.this, "Error in SIgnup", Toast.LENGTH_LONG).show();
                             signupSubmitBtn.setVisibility(View.VISIBLE);
                             signupProgressBar.setVisibility(View.GONE);
                             signupEmailField.setBackgroundResource(R.drawable.red_rounded_border);
                             signupEmailErrMsg.setVisibility(View.VISIBLE);
-                            signupEmailErrMsg.setText("Email already exists");
-                            return;
+                            signupEmailErrMsg.setText("Email already exists or invalid");
+
+                            signupUsernameField.setFocusable(true);
+                            signupEmailField.setFocusable(true);
+                            signupPasswordField.setFocusable(true);
                         }
                     }
                 });
