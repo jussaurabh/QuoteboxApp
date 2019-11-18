@@ -11,10 +11,12 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
@@ -42,16 +44,14 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-//    private QuotePostsListener quotePostsListener;
-//    private PoemPostsListener poemPostsListener;
-//    private StoryPostsListener storyPostsListener;
-
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore firestore;
     CollectionNames collectionNames;
     List<Posts> allPostsList, quotepostdata, poempostdata, storypostdata;
     GlobalClass globalClass;
+
+    private boolean isHomeLoaded = false;
 
     private DrawerLayout drawerLayout;
     Toolbar toolbar;
@@ -62,7 +62,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab, storyPostFab;
     ConstraintLayout quoteFabWrapper, poemFabWrapper, storyFabWrapper;
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+        this.isHomeLoaded = true;
+        Log.d("HOME_ACT_LOG", "onHOMePause");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (isHomeLoaded)
+            Log.d("HOME_ACT_LOG", "onResume");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

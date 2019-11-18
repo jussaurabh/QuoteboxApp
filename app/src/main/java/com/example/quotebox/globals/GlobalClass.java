@@ -9,6 +9,7 @@ import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.interfaces.PoemPostsListener;
 import com.example.quotebox.interfaces.QuotePostsListener;
 import com.example.quotebox.interfaces.StoryPostsListener;
+import com.example.quotebox.models.Comments;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +33,7 @@ public class GlobalClass extends Application {
     private boolean isUserLoggedIn = false;
     private Users loggedInUserData;
     private List<Posts> quotepostdata, poempostdata, storypostdata;
+    private HashMap<String, Comments> allComments = new HashMap<>();
     private HashMap<String, Users> allUsers = new HashMap<>();
 
     private FirebaseFirestore firestore;
@@ -120,7 +122,7 @@ public class GlobalClass extends Application {
                             post.setPostTitle(docs.getString(Posts.POST_TITLE));
                             post.setUserId(docs.getString(Posts.USER_ID));
                             post.setPostUser(docs.getString(Posts.POST_USER));
-                            post.setPostLikes(Integer.parseInt(docs.get(Posts.POST_LIKES).toString()));
+                            post.setPostLikes((List<String>) docs.get(Posts.POST_LIKES));
                             post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
                             post.setPostTimestamp(docs.getTimestamp(Posts.POST_TIMESTAMP));
 
@@ -170,6 +172,11 @@ public class GlobalClass extends Application {
                             user.setUsername(doc.getString(Users.USERNAME));
                             user.setUserAvatar(doc.getString(Users.USERAVATAR));
                             user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
+                            user.setNoOfStoryPosted(Integer.parseInt(doc.get(Users.NO_OF_STORY_POSTED).toString()));
+                            user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
+                            user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
+                            user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
+                            user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
 
                             allUsers.put(doc.getId(), user);
                         }
@@ -181,5 +188,13 @@ public class GlobalClass extends Application {
 
     public HashMap<String, Users> getAllUsersData() {
         return allUsers;
+    }
+
+    public HashMap<String, Comments> getAllComments() {
+        return allComments;
+    }
+
+    public void setAllComments(HashMap<String, Comments> allComments) {
+        this.allComments = allComments;
     }
 }

@@ -262,7 +262,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful() && task.getResult() != null) {
                             final String gLoginUserId = task.getResult().getUser().getUid();
 
-
                             firestore.collection(collectionNames.getUserCollection())
                                     .whereEqualTo(Users.EMAIL, account.getEmail())
                                     .get()
@@ -288,8 +287,8 @@ public class LoginActivity extends AppCompatActivity {
                                                         0,
                                                         0,
                                                         0,
-                                                        0,
-                                                        0
+                                                        new ArrayList<String>(),
+                                                        new ArrayList<String>()
                                                 );
 
                                                 firestore.collection(collectionNames.getUserCollection())

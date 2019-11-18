@@ -104,8 +104,8 @@ public class ProfileActivity extends AppCompatActivity {
                         user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
                         user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
                         user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
-                        user.setFollowersCount(Integer.parseInt(doc.get(Users.FOLLOWERS_COUNT).toString()));
-                        user.setFollowingsCount(Integer.parseInt(doc.get(Users.FOLLOWINGS_COUNT).toString()));
+                        user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
+                        user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
 
                         Log.d("PROFILE_ACT_LOG", "user profile: " + new Gson().toJson(user));
 
@@ -116,8 +116,8 @@ public class ProfileActivity extends AppCompatActivity {
                         }
 
                         profileActUsernameTV.setText(user.getUsername());
-                        profileActFollowersCountTV.setText(Integer.toString(user.getFollowersCount()));
-                        profileActFollowingsCountTV.setText(Integer.toString(user.getFollowingsCount()));
+                        profileActFollowersCountTV.setText(Integer.toString(user.getFollowerUsers().size()));
+                        profileActFollowingsCountTV.setText(Integer.toString(user.getFollowingUsers().size()));
                         profileActLikesCountTV.setText(Integer.toString(user.getFavPosts().size()));
 
                         String poemCount = String.format(Locale.getDefault(), "Poems (%d)", user.getNoOfPoemPosted());

@@ -33,7 +33,7 @@ public class Posts {
     private String postImage;
     private String postType;
     private String userId;
-    private int postLikes;
+    private List<String> postLikes;
     private int postComments;
     private Timestamp postTimestamp;
 
@@ -45,7 +45,7 @@ public class Posts {
                  String postType,
                  String userId,
                  String postUser,
-                 int postLikes,
+                 List<String> postLikes,
                  int postComments) {
         this.postTitle = postTitle;
         this.post = post;
@@ -98,11 +98,11 @@ public class Posts {
         this.userId = userId;
     }
 
-    public int getPostLikes() {
+    public List<String> getPostLikes() {
         return postLikes;
     }
 
-    public void setPostLikes(int postLikes) {
+    public void setPostLikes(List<String> postLikes) {
         this.postLikes = postLikes;
     }
 

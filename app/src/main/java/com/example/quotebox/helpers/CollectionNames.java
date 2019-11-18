@@ -4,6 +4,7 @@ public class CollectionNames {
 
     private String UserCollection = "users";
     private String PostCollection = "posts";
+    private String CommentCollection = "comments";
 
     public CollectionNames() {}
 
@@ -14,5 +15,9 @@ public class CollectionNames {
 
     public String getPostCollection() {
         return PostCollection;
+    }
+
+    public String getCommentCollection() {
+        return CommentCollection;
     }
 }

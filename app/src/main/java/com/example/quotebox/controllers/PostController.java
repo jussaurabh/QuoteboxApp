@@ -20,16 +20,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostController {
+public class PostController extends PostListeners {
 
     private FirebaseFirestore firestore;
     private String postCollection;
     private List<Posts> allPosts;
     private Posts post;
 
-    private PostListeners.OnGetAllPostCompleteListener getAllPostCompleteListener;
-    private PostListeners.OnGetPostCompleteListener getPostCompleteListener;
-    private PostListeners.OnPostLikeUpdateListener postLikeUpdateListener;
+    private OnGetAllPostCompleteListener getAllPostCompleteListener;
+    private OnGetPostCompleteListener getPostCompleteListener;
+    private OnPostLikeUpdateListener postLikeUpdateListener;
 
     public PostController() {
         this.firestore = FirebaseFirestore.getInstance();
@@ -39,20 +39,22 @@ public class PostController {
         postLikeUpdateListener = null;
     }
 
-    public PostController updatePostLikeCount(final String postid, final boolean status) {
-        getPost(postid).addOnGetPostCompleteListener(new PostListeners.OnGetPostCompleteListener() {
+    public PostController updatePostLikeCount(final String postid, final String userid, final boolean status) {
+        getPost(postid).addOnGetPostCompleteListener(new OnGetPostCompleteListener() {
             @Override
             public void onGetPost(final Posts post) {
                 firestore.collection(postCollection).document(postid)
-                        .update(Posts.POST_LIKES, FieldValue.increment(status ? 1 : -1))
+                        .update(Posts.POST_LIKES, status ? FieldValue.arrayUnion(userid) : FieldValue.arrayRemove(userid))
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     if (postLikeUpdateListener != null)
-                                        postLikeUpdateListener.onPostLikeUpdate(status ?
-                                                post.getPostLikes() + 1 :
-                                                post.getPostLikes() - 1);
+                                        postLikeUpdateListener.onPostLikeUpdate(
+                                                status ?
+                                                        post.getPostLikes().size() + 1 :
+                                                        post.getPostLikes().size() - 1
+                                        );
                                 }
                             }
                         });
@@ -84,7 +86,7 @@ public class PostController {
                         post.setPostImage(doc.getString(Posts.POST_IMAGE));
                         post.setPostTimestamp(doc.getTimestamp(Posts.POST_TIMESTAMP));
                         post.setUserId(doc.getString(Posts.USER_ID));
-                        post.setPostLikes(Integer.parseInt(doc.get(Posts.POST_LIKES).toString()));
+                        post.setPostLikes((List<String>) doc.get(Posts.POST_LIKES));
                         post.setPostComments(Integer.parseInt(doc.get(Posts.POST_COMMENTS).toString()));
 
                         if (getPostCompleteListener != null)
@@ -102,26 +104,28 @@ public class PostController {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List<Posts> posts = new ArrayList<>();
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            List<Posts> posts = new ArrayList<>();
 
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            Posts post = new Posts();
-                            post.setPostId(doc.getId());
-                            post.setPost(doc.getString(Posts.POST));
-                            post.setPostType(doc.getString(Posts.POST_TYPE));
-                            post.setPostTitle(doc.getString(Posts.POST_TITLE));
-                            post.setPostUser(doc.getString(Posts.POST_USER));
-                            post.setPostImage(doc.getString(Posts.POST_IMAGE));
-                            post.setPostTimestamp(doc.getTimestamp(Posts.POST_TIMESTAMP));
-                            post.setUserId(doc.getString(Posts.USER_ID));
-                            post.setPostLikes(Integer.parseInt(doc.get(Posts.POST_LIKES).toString()));
-                            post.setPostComments(Integer.parseInt(doc.get(Posts.POST_COMMENTS).toString()));
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                Posts post = new Posts();
+                                post.setPostId(doc.getId());
+                                post.setPost(doc.getString(Posts.POST));
+                                post.setPostType(doc.getString(Posts.POST_TYPE));
+                                post.setPostTitle(doc.getString(Posts.POST_TITLE));
+                                post.setPostUser(doc.getString(Posts.POST_USER));
+                                post.setPostImage(doc.getString(Posts.POST_IMAGE));
+                                post.setPostTimestamp(doc.getTimestamp(Posts.POST_TIMESTAMP));
+                                post.setUserId(doc.getString(Posts.USER_ID));
+                                post.setPostLikes((List<String>) doc.get(Posts.POST_LIKES));
+                                post.setPostComments(Integer.parseInt(doc.get(Posts.POST_COMMENTS).toString()));
 
-                            posts.add(post);
+                                posts.add(post);
+                            }
+                            if (getAllPostCompleteListener != null)
+                                getAllPostCompleteListener.onGetAllPost(posts);
                         }
 
-                        if (getAllPostCompleteListener != null)
-                            getAllPostCompleteListener.onGetAllPost(posts);
                     }
                 });
 
@@ -129,7 +133,7 @@ public class PostController {
     }
 
 //    public PostController getPoemPosts(String uid) {
-//        getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
+//        getAllPosts().addOnGetAllPostCompleteListener(new OnGetAllPostCompleteListener() {
 //            @Override
 //            public void onGetAllPost(List<Posts> postsList) {
 //
@@ -147,15 +151,15 @@ public class PostController {
         this.post = post;
     }
 
-    public void addOnGetAllPostCompleteListener(PostListeners.OnGetAllPostCompleteListener getAllPostCompleteListener) {
+    public void addOnGetAllPostCompleteListener(OnGetAllPostCompleteListener getAllPostCompleteListener) {
         this.getAllPostCompleteListener = getAllPostCompleteListener;
     }
 
-    public void addOnGetPostCompleteListener(PostListeners.OnGetPostCompleteListener getPostCompleteListener) {
+    public void addOnGetPostCompleteListener(OnGetPostCompleteListener getPostCompleteListener) {
         this.getPostCompleteListener = getPostCompleteListener;
     }
 
-    public void addOnPostLikeUpdateListener(PostListeners.OnPostLikeUpdateListener postLikeUpdateListener) {
+    public void addOnPostLikeUpdateListener(OnPostLikeUpdateListener postLikeUpdateListener) {
         this.postLikeUpdateListener = postLikeUpdateListener;
     }
 }

@@ -42,6 +42,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -161,7 +162,7 @@ public class PostQuoteActivity extends AppCompatActivity {
             public void onClick(View view) {
                 postProgressBar.setVisibility(View.VISIBLE);
                 postSubmitBtn.setVisibility(View.GONE);
-                insertPostToDatabase();
+                storePostImageToFirestorage();
             }
         });
     }
@@ -180,7 +181,7 @@ public class PostQuoteActivity extends AppCompatActivity {
     }
 
 
-    public void insertPostToDatabase() {
+    public void storePostImageToFirestorage() {
 
         // returns all users credentials
         final String LOGGED_IN_USER_ID = firebaseUser.getUid();
@@ -192,6 +193,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         post.setUserId(LOGGED_IN_USER_ID);
         post.setPostUser(globalClass.getLoggedInUserData().getUsername());
         post.setPostTimestamp(Timestamp.now());
+        post.setPostLikes(new ArrayList<String>());
 
         if (imgUri != null) {
             final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
@@ -211,89 +213,71 @@ public class PostQuoteActivity extends AppCompatActivity {
 
                             post.setPostImage(downloadUri.toString());
 
-                            firestore.collection(collNames.getPostCollection())
-                                    .add(post)
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                                            if (task.isSuccessful()) {
-                                                postProgressBar.setVisibility(View.GONE);
-                                                postSubmitBtn.setVisibility(View.VISIBLE);
-
-                                                switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
-                                                    case Posts.QUOTE_TYPE_POST: {
-                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
-                                                        break;
-                                                    }
-                                                    case Posts.POEM_TYPE_POST: {
-                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
-                                                        break;
-                                                    }
-                                                    case Posts.STORY_TYPE_POST: {
-                                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                                .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
-//                                                                .update(Users.NO_OF_STORY_POSTED, globalClass.incrementPostCount(getIntent().getStringExtra(Posts.POST_TYPE)));
-                                                        break;
-                                                    }
-                                                }
-
-                                                finish();
-                                                startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
-                                            }
-                                            else {
-                                                Log.d("POST_LOG ", task.getException().toString());
-                                            }
-                                        }
-                                    });
+                            insertPostToDatabase(post, LOGGED_IN_USER_ID);
                         }
                     }
                 });
         }
         else {
-            firestore.collection(collNames.getPostCollection())
-                    .add(post)
-                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                postProgressBar.setVisibility(View.GONE);
-                                postSubmitBtn.setVisibility(View.VISIBLE);
-
-                                switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
-                                    case Posts.QUOTE_TYPE_POST: {
-                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
-                                        break;
-                                    }
-                                    case Posts.POEM_TYPE_POST: {
-                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
-                                        break;
-                                    }
-                                    case Posts.STORY_TYPE_POST: {
-                                        firestore.collection(collNames.getUserCollection()).document(LOGGED_IN_USER_ID)
-                                                .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
-                                        break;
-                                    }
-                                }
-
-                                finish();
-                                startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
-                            }
-                            else {
-                                Log.d("POST_LOG ", task.getException().toString());
-                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("POST_QUTOE_ACTIVITY ", e.getMessage());
-                        }
-                    });
+            insertPostToDatabase(post, LOGGED_IN_USER_ID);
         }
+    }
+
+
+    public void insertPostToDatabase(Posts post, final String uid) {
+        firestore.collection(collNames.getPostCollection())
+                .add(post)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
+                            postProgressBar.setVisibility(View.GONE);
+                            postSubmitBtn.setVisibility(View.VISIBLE);
+
+                            switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
+                                case Posts.QUOTE_TYPE_POST: {
+                                    firestore.collection(collNames.getUserCollection())
+                                            .document(uid)
+                                            .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
+
+                                    globalClass.getAllUsersData().get(uid)
+                                            .setNoOfQuotesPosted(globalClass.getAllUsersData().get(uid).getNoOfQuotesPosted() + 1);
+                                    break;
+                                }
+                                case Posts.POEM_TYPE_POST: {
+                                    firestore.collection(collNames.getUserCollection())
+                                            .document(uid)
+                                            .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
+
+                                    globalClass.getAllUsersData().get(uid)
+                                            .setNoOfPoemPosted(globalClass.getAllUsersData().get(uid).getNoOfPoemPosted() + 1);
+                                    break;
+                                }
+                                case Posts.STORY_TYPE_POST: {
+                                    firestore.collection(collNames.getUserCollection())
+                                            .document(uid)
+                                            .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
+
+                                    globalClass.getAllUsersData().get(uid)
+                                            .setNoOfStoryPosted(globalClass.getAllUsersData().get(uid).getNoOfStoryPosted() + 1);
+                                    break;
+                                }
+                            }
+
+                            finish();
+                            startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
+                        }
+                        else {
+                            Log.d("POST_LOG ", task.getException().toString());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("POST_QUTOE_ACTIVITY ", e.getMessage());
+                    }
+                });
     }
 
 

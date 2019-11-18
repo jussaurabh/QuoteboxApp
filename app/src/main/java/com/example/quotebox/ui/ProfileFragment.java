@@ -1,6 +1,7 @@
 package com.example.quotebox.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
 import android.os.Bundle;
@@ -19,29 +20,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.quotebox.FavoritePostActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 
 public class ProfileFragment extends Fragment {
 
-    private FirebaseFirestore firestore;
-    private Users userPostDetails;
     private GlobalClass globalClass;
 
     private ImageView userProfileAvatarIV;
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
     private Button userQuoteCountBtn, userPoemCountBtn, userStoryCountBtn;
-    private LinearLayout userAboutWrapperLL, userFollowBtnWrapperLL;
+    private LinearLayout userAboutWrapperLL, followerCountWrapperLL, followingCountWrapperLL, postLikeCountWrapperLL;
 
 
     @Nullable
@@ -51,26 +53,27 @@ public class ProfileFragment extends Fragment {
 
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
-        firestore = FirebaseFirestore.getInstance();
         globalClass = (GlobalClass) getActivity().getApplicationContext();
-        Users loggedInUserData = globalClass.getLoggedInUserData();
+        Users loggedInUserData = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         userProfileAvatarIV = view.findViewById(R.id.userProfileAvatarIV);
         userProfileAuthornameTV = view.findViewById(R.id.userProfileAuthornameTV);
         userFollowerCountTV = view.findViewById(R.id.userFollowersCountTV);
         userFollowingsCountTV = view.findViewById(R.id.userFollowingsCountTV);
+        followerCountWrapperLL = view.findViewById(R.id.followerCountWrapperLL);
+        followingCountWrapperLL = view.findViewById(R.id.followingCountWrapperLL);
+        postLikeCountWrapperLL = view.findViewById(R.id.postLikeCountWrapperLL);
         userLikesCountTV = view.findViewById(R.id.userLikesCountTV);
         userAboutTV = view.findViewById(R.id.userAboutTV);
         userAboutWrapperLL = view.findViewById(R.id.userAboutWrapperLL);
-        userFollowBtnWrapperLL = view.findViewById(R.id.userFollowBtnWrapperLL);
         userQuoteCountBtn = view.findViewById(R.id.userQuoteCountBtn);
         userPoemCountBtn = view.findViewById(R.id.userPoemCountBtn);
         userStoryCountBtn = view.findViewById(R.id.userStoryCountBtn);
 
         userProfileAuthornameTV.setText(loggedInUserData.getUsername());
 
-        userFollowerCountTV.setText(String.valueOf(loggedInUserData.getFollowersCount()));
-        userFollowingsCountTV.setText(String.valueOf(loggedInUserData.getFollowingsCount()));
+        userFollowerCountTV.setText(String.valueOf(loggedInUserData.getFollowerUsers().size()));
+        userFollowingsCountTV.setText(String.valueOf(loggedInUserData.getFollowingUsers().size()));
         userLikesCountTV.setText(String.valueOf(loggedInUserData.getFavPosts().size()));
 
         String poemCount = String.format(Locale.getDefault(), "Poems (%d)", loggedInUserData.getNoOfPoemPosted());
@@ -106,6 +109,13 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 togglePostFragment(Posts.STORY_TYPE_POST);
+            }
+        });
+
+        postLikeCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), FavoritePostActivity.class));
             }
         });
 

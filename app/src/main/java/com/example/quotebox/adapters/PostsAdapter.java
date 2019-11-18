@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,26 +23,19 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.quotebox.HomeActivity;
+import com.example.quotebox.PostCommentsActivity;
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
-import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.ProfileFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -58,7 +53,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     FirebaseFirestore firestore;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
-    CollectionDialogAdapter collectionDialogAdapter;
+//    CollectionDialogAdapter collectionDialogAdapter;
     PostController postController;
 
     RecyclerView collectionNamesRL;
@@ -79,18 +74,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
         postController= new PostController();
 
-        Log.d("PA_ALL_POSTS", postsList.toString());
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull final PostsViewHolder holder, final int position) {
 
-        final HashMap<String, Users> data = globalClass.getAllUsersData();
+        final HashMap<String, Users> allUsersData = globalClass.getAllUsersData();
         final Users loggedInUserData = globalClass.getLoggedInUserData();
         final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         final String postid = postsList.get(position).getPostId();
-        final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
 
         Date d = new Date(postsList.get(position).getPostTimestamp().getSeconds() * 1000);
         DateFormat dateFormat = new SimpleDateFormat("MMM d, ''yy");
@@ -105,12 +98,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         holder.authorUsernameTV.setText("@"+ postsList.get(position).getPostUser());
         holder.authorNameTV.setText("- " + postsList.get(position).getPostUser());
         holder.commentCountTV.setText(Integer.toString(postsList.get(position).getPostComments()));
-        holder.favoriteCountTV.setText(Integer.toString(postsList.get(position).getPostLikes()));
+        holder.favoriteCountTV.setText(Integer.toString(postsList.get(position).getPostLikes().size()));
         holder.postDateTV.setText(dateFormat.format(d));
 
+        final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
 
-        if (data.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
-            Picasso.get().load(data.get(postsList.get(position).getUserId()).getUserAvatar())
+        if (allUsersData.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
+            Picasso.get().load(allUsersData.get(postsList.get(position).getUserId()).getUserAvatar())
                     .transform(new ImageCircleTransform())
                     .into(holder.authorAvatarIV);
         }
@@ -139,7 +133,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             public void onClick(View view) {
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.favoriteImageBtn.setVisibility(View.GONE);
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), true)
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), true)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -148,9 +142,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
                                 holder.favoriteCountTV.setText(Integer.toString(postLikeCount));
 
-                                if (!data.get(userid).getFavPosts().contains(postid)) {
-                                    data.get(userid).getFavPosts().add(postid);
-                                }
+                                allUsersData.get(userid).getFavPosts().add(postid);
 
                                 loggedInUserData.getFavPosts().add(postid);
                             }
@@ -164,7 +156,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.unFavoriteIB.setVisibility(View.GONE);
 
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), false)
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), false)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -175,19 +167,50 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
                                 loggedInUserData.getFavPosts().remove(postid);
 
-                                if (data.get(userid).getFavPosts().contains(postid)) {
-                                    data.get(userid).getFavPosts().remove(postid);
-                                }
+                                allUsersData.get(userid).getFavPosts().remove(postid);
                             }
                         });
             }
         });
 
 
-        if (data.get(userid).getFavPosts().contains(postsList.get(position).getPostId())) {
+        if (allUsersData.get(userid).getFavPosts().contains(postsList.get(position).getPostId())) {
             holder.favoriteImageBtn.setVisibility(View.GONE);
             holder.unFavoriteIB.setVisibility(View.VISIBLE);
         }
+
+
+        holder.postCardMenuImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(context, holder.postCardMenuImageBtn);
+                popup.inflate(R.menu.post_card_menu);
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.report_post: {
+                                break;
+                            }
+                        }
+
+                        return false;
+                    }
+                });
+
+                popup.show();
+            }
+        });
+
+
+        holder.commentImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(new Intent(context, PostCommentsActivity.class).putExtra(Posts.POST_ID, postid));
+            }
+        });
+
 
     }
 
@@ -199,7 +222,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     class PostsViewHolder extends RecyclerView.ViewHolder {
 
         ImageView authorAvatarIV, cardPostImageIV;
-        ImageButton favoriteImageBtn, unFavoriteIB, commentImageBtn, collectionAddImageBtn;
+        ImageButton favoriteImageBtn, unFavoriteIB, commentImageBtn, collectionAddImageBtn, postCardMenuImageBtn;
         TextView authorPostTitleTV, authorUsernameTV, authorPostTV, authorNameTV, favoriteCountTV, commentCountTV, postDateTV;
         ProgressBar postFavBtnProgressBar;
 
@@ -220,7 +243,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             commentCountTV = itemView.findViewById(R.id.commentCountTV);
             postDateTV = itemView.findViewById(R.id.postDateTV);
             postFavBtnProgressBar = itemView.findViewById(R.id.postFavBtnPB);
-
+            postCardMenuImageBtn = itemView.findViewById(R.id.postCardMenuImageBtn);
 
             collectionAddImageBtn.setOnClickListener(new View.OnClickListener() {
                 @Override

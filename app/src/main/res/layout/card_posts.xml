@@ -36,6 +36,29 @@
                     android:layout_height="50dp"
                     android:layout_marginBottom="10dp">
 
+                    <ImageButton
+                        android:id="@+id/postCardMenuImageBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/author_avatar"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:background="@color/transparent"
+                        app:srcCompat="@drawable/ic_more_vert_black" />
+
+<!--                    <Button-->
+<!--                        android:id="@+id/postCardMenuBtn"-->
+<!--                        android:layout_width="50dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentTop="true"-->
+<!--                        android:layout_alignParentEnd="true"-->
+<!--                        android:layout_marginTop="0dp"-->
+<!--                        android:layout_marginEnd="0dp"-->
+<!--                        android:background="@color/colorWhite"-->
+<!--                        android:text="&#8942;"-->
+<!--                        android:textAppearance="?android:textAppearanceLarge"/>-->
+
                     <ImageView
                         android:id="@+id/author_avatar"
                         android:layout_width="50dp"
@@ -78,7 +101,6 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                         <ImageButton
-                            android:id="@+id/imageButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -159,13 +181,12 @@
                     app:srcCompat="@drawable/ic_collection_black_add" />
 
                 <ImageButton
-                    android:id="@+id/collectionHasPostImageButton"
+                    android:id="@+id/postAddedToCollectionImageBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_collection_blue_added" />
+                    app:srcCompat="@drawable/ic_collection_blue_added"
+                    android:visibility="gone"/>
 
                 <ProgressBar
                     android:id="@+id/postCollectionBtnProgressBar"

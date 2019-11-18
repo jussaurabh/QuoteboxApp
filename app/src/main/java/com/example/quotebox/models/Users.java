@@ -14,13 +14,12 @@ public class Users {
     public static final String USERAVATAR = "userAvatar";
     public static final String USER_ABOUT_ME = "userAboutMe";
     public static final String USER_DOB = "userDOB";
-//    public static final String FAV_POST_COUNT = "favPostCount";
     public static final String NO_OF_QUOTES_POSTED = "noOfQuotesPosted";
     public static final String NO_OF_POEM_POSTED = "noOfPoemPosted";
     public static final String NO_OF_STORY_POSTED = "noOfStoryPosted";
-    public static final String FOLLOWERS_COUNT = "followersCount";
-    public static final String FOLLOWINGS_COUNT = "followingsCount";
     public static final String FAV_POSTS = "favPosts";
+    public static final String FOLLOWER_USERS = "followerUsers";
+    public static final String FOLLOWING_USERS = "followingUsers";
 
 
     private String username;
@@ -33,8 +32,8 @@ public class Users {
     private int noOfQuotesPosted;
     private int noOfPoemPosted;
     private int noOfStoryPosted;
-    private int followersCount;
-    private int followingsCount;
+    private List<String> followerUsers;
+    private List<String> followingUsers;
 
     public Users() { }
 
@@ -48,8 +47,8 @@ public class Users {
                  int noOfQuotesPosted,
                  int noOfPoemPosted,
                  int noOfStoryPosted,
-                 int followersCount,
-                 int followingsCount) {
+                 List<String> followerUsers,
+                 List<String> followingUsers) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -60,8 +59,8 @@ public class Users {
         this.noOfQuotesPosted = noOfQuotesPosted;
         this.noOfPoemPosted = noOfPoemPosted;
         this.noOfStoryPosted = noOfStoryPosted;
-        this.followersCount = followersCount;
-        this.followingsCount = followingsCount;
+        this.followerUsers = followerUsers;
+        this.followingUsers = followingUsers;
     }
 
     public String getUsername() {
@@ -136,27 +135,27 @@ public class Users {
         this.noOfStoryPosted = noOfStoryPosted;
     }
 
-    public int getFollowersCount() {
-        return followersCount;
-    }
-
-    public void setFollowersCount(int followersCount) {
-        this.followersCount = followersCount;
-    }
-
-    public int getFollowingsCount() {
-        return followingsCount;
-    }
-
-    public void setFollowingsCount(int followingsCount) {
-        this.followingsCount = followingsCount;
-    }
-
     public List<String> getFavPosts() {
         return favPosts;
     }
 
     public void setFavPosts(List<String> favPosts) {
         this.favPosts = favPosts;
+    }
+
+    public List<String> getFollowerUsers() {
+        return followerUsers;
+    }
+
+    public void setFollowerUsers(List<String> followerUsers) {
+        this.followerUsers = followerUsers;
+    }
+
+    public List<String> getFollowingUsers() {
+        return followingUsers;
+    }
+
+    public void setFollowingUsers(List<String> followingUsers) {
+        this.followingUsers = followingUsers;
     }
 }

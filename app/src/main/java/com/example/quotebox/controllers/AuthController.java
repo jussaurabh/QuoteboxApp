@@ -48,8 +48,8 @@ public class AuthController {
                                     0,
                                     0,
                                     0,
-                                    0,
-                                    0
+                                    new ArrayList<String>(),
+                                    new ArrayList<String>()
                             );
 
                             firestore.collection(new CollectionNames().getUserCollection())
