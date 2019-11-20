@@ -21,6 +21,9 @@ public class Users {
     public static final String FOLLOWER_USERS = "followerUsers";
     public static final String FOLLOWING_USERS = "followingUsers";
 
+    public static final String USER_POST_COLLECTIONS = "userPostCollections";
+    public static final String DEFAULT_POST_COLLECTION = "Favorites";
+
 
     private String username;
     private String email;
@@ -34,6 +37,7 @@ public class Users {
     private int noOfStoryPosted;
     private List<String> followerUsers;
     private List<String> followingUsers;
+    private HashMap<String, List<String>> userPostCollections;
 
     public Users() { }
 
@@ -48,7 +52,8 @@ public class Users {
                  int noOfPoemPosted,
                  int noOfStoryPosted,
                  List<String> followerUsers,
-                 List<String> followingUsers) {
+                 List<String> followingUsers,
+                 HashMap<String, List<String>> userPostCollections) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -61,6 +66,7 @@ public class Users {
         this.noOfStoryPosted = noOfStoryPosted;
         this.followerUsers = followerUsers;
         this.followingUsers = followingUsers;
+        this.userPostCollections = userPostCollections;
     }
 
     public String getUsername() {
@@ -157,5 +163,13 @@ public class Users {
 
     public void setFollowingUsers(List<String> followingUsers) {
         this.followingUsers = followingUsers;
+    }
+
+    public HashMap<String, List<String>> getUserPostCollections() {
+        return userPostCollections;
+    }
+
+    public void setUserPostCollections(HashMap<String, List<String>> userPostCollections) {
+        this.userPostCollections = userPostCollections;
     }
 }

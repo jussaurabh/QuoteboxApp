@@ -15,14 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.quotebox.adapters.PostsAdapter;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
-import com.example.quotebox.ui.ProfileFragment;
 import com.example.quotebox.ui.ProfilePoemFragment;
 import com.example.quotebox.ui.ProfileQuoteFragment;
 import com.example.quotebox.ui.ProfileStoryFragment;
@@ -33,7 +31,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -90,7 +87,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        firestore.collection(new CollectionNames().getUserCollection()).document(getIntent().getStringExtra(Users.USER_ID))
+        firestore.collection(new CollectionNames().getUserCollectionName()).document(getIntent().getStringExtra(Users.USER_ID))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

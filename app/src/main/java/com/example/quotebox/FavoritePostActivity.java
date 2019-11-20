@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import com.example.quotebox.adapters.PostsAdapter;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.models.Posts;
+import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -65,7 +66,7 @@ public class FavoritePostActivity extends AppCompatActivity {
         userFavPostsRV.setLayoutManager(new LinearLayoutManager(this));
 
 
-        firestore.collection(new CollectionNames().getPostCollection())
+        firestore.collection(new CollectionNames().getPostCollectionName())
                 .whereArrayContains(Posts.POST_LIKES, FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -84,7 +85,7 @@ public class FavoritePostActivity extends AppCompatActivity {
                                     post.setPostImage(docs.getString(Posts.POST_IMAGE));
                                     post.setPostType(docs.getString(Posts.POST_TYPE));
                                     post.setPostTitle(docs.getString(Posts.POST_TITLE));
-                                    post.setUserId(docs.getString(Posts.USER_ID));
+                                    post.setUserId(docs.getString(Users.USER_ID));
                                     post.setPostUser(docs.getString(Posts.POST_USER));
                                     post.setPostLikes((List<String>) docs.get(Posts.POST_LIKES));
                                     post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));

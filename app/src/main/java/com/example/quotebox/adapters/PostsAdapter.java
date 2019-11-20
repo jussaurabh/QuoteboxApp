@@ -1,46 +1,45 @@
 package com.example.quotebox.adapters;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quotebox.PostCollectionListActivity;
 import com.example.quotebox.PostCommentsActivity;
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
+import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.ProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,12 +52,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     FirebaseFirestore firestore;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
-//    CollectionDialogAdapter collectionDialogAdapter;
     PostController postController;
-
-    RecyclerView collectionNamesRL;
-    Dialog collectionNamesDialog;
-    Button selectedCollectionSubmitBtn, createNewCollectionBtn;
+    CollectionNames collNames;
 
     public PostsAdapter(Context context, List<Posts> posts) {
         this.context = context;
@@ -73,6 +68,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
         postController= new PostController();
+        collNames = new CollectionNames();
 
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
@@ -133,7 +129,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             public void onClick(View view) {
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.favoriteImageBtn.setVisibility(View.GONE);
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), true)
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), userid, true)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -156,7 +152,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.unFavoriteIB.setVisibility(View.GONE);
 
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), false)
+                postController.updatePostLikeCount(postsList.get(position).getPostId(), userid, false)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -212,6 +208,54 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         });
 
 
+        for (List<String> ls : allUsersData.get(userid).getUserPostCollections().values()) {
+            if (ls.contains(postid)) {
+                holder.collectionAddImageBtn.setVisibility(View.GONE);
+                holder.postAddedToCollectionImageBtn.setVisibility(View.VISIBLE);
+                break;
+            }
+        }
+
+
+        holder.collectionAddImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+
+                context.startActivity(
+                        new Intent(
+                                context.getApplicationContext(),
+                                PostCollectionListActivity.class
+                        ).putExtra(Posts.POST_ID, postid)
+                );
+
+//                if (allUsersData.get(userid).getUserPostCollections().size() == 1) {
+//                    firestore.collection(collNames.getUserCollectionName())
+//                            .document(userid)
+//                            .update(Users.USER_POST_COLLECTIONS + "." + Users.DEFAULT_POST_COLLECTION, FieldValue.arrayUnion(postid))
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    holder.postCollectionBtnProgressBar.setVisibility(View.GONE);
+//                                    holder.postAddedToCollectionImageBtn.setVisibility(View.VISIBLE);
+//
+//                                }
+//                            });
+//                }
+//                else {
+//
+//                }
+            }
+        });
+
+
+        holder.postAddedToCollectionImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
     }
 
     @Override
@@ -219,14 +263,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         return postsList.size();
     }
 
+
     class PostsViewHolder extends RecyclerView.ViewHolder {
 
         ImageView authorAvatarIV, cardPostImageIV;
-        ImageButton favoriteImageBtn, unFavoriteIB, commentImageBtn, collectionAddImageBtn, postCardMenuImageBtn;
+        ImageButton favoriteImageBtn, unFavoriteIB, commentImageBtn, collectionAddImageBtn, postCardMenuImageBtn, postAddedToCollectionImageBtn;
         TextView authorPostTitleTV, authorUsernameTV, authorPostTV, authorNameTV, favoriteCountTV, commentCountTV, postDateTV;
-        ProgressBar postFavBtnProgressBar;
+        ProgressBar postFavBtnProgressBar, postCollectionBtnProgressBar;
 
-        public PostsViewHolder(@NonNull View itemView) {
+        public PostsViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             authorAvatarIV = itemView.findViewById(R.id.author_avatar);
@@ -235,6 +280,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             unFavoriteIB = itemView.findViewById(R.id.unFavoriteIB);
             commentImageBtn = itemView.findViewById(R.id.commentImageButton);
             collectionAddImageBtn = itemView.findViewById(R.id.collectionAddImageButton);
+            postAddedToCollectionImageBtn = itemView.findViewById(R.id.postAddedToCollectionImageBtn);
+            postCollectionBtnProgressBar = itemView.findViewById(R.id.postCollectionBtnProgressBar);
             authorPostTitleTV = itemView.findViewById(R.id.author_post_title_name);
             authorUsernameTV = itemView.findViewById(R.id.author_username);
             authorPostTV = itemView.findViewById(R.id.author_post);
@@ -244,45 +291,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             postDateTV = itemView.findViewById(R.id.postDateTV);
             postFavBtnProgressBar = itemView.findViewById(R.id.postFavBtnPB);
             postCardMenuImageBtn = itemView.findViewById(R.id.postCardMenuImageBtn);
-
-            collectionAddImageBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    collectionNamesDialog = new Dialog(view.getContext());
-                    collectionNamesDialog.setContentView(R.layout.collection_names_dialog);
-                    collectionNamesDialog.getWindow().setGravity(Gravity.BOTTOM);
-                    collectionNamesDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-
-                    selectedCollectionSubmitBtn = collectionNamesDialog.findViewById(R.id.selectedCollectionSubmitBtn);
-                    createNewCollectionBtn = collectionNamesDialog.findViewById(R.id.createNewCollectionBtn);
-                    collectionNamesRL = collectionNamesDialog.findViewById(R.id.collectionNamesRL);
-                    collectionNamesRL.setHasFixedSize(true);
-                    collectionNamesRL.setLayoutManager(new LinearLayoutManager(view.getContext()));
-                    collectionNamesDialog.show();
-
-                    List<String> pcl = new ArrayList<>();
-                    pcl.add(0, "col1");
-                    pcl.add(1, "col2");
-                    pcl.add(2, "col3");
-
-                    Log.d("POST_ADAP", "collec name : " + pcl.toString());
-
-
-//                    collectionDialogAdapter = new CollectionDialogAdapter(pcl, this);
-//                    collectionNamesRL.setAdapter(collectionNamesAdapter);
-
-//                    selectedCollectionSubmitBtn.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            collectionNamesDialog.cancel();
-//                        }
-//                    });
-
-                }
-            });
-
-
-
 
         }
     }

@@ -2,22 +2,25 @@ package com.example.quotebox.helpers;
 
 public class CollectionNames {
 
-    private String UserCollection = "users";
-    private String PostCollection = "posts";
-    private String CommentCollection = "comments";
+    private String USERS = "users";
+    private String POSTS = "posts";
+    private String COMMENTS = "comments";
+    private String POST_COLLECTIONS = "postCollections";
 
     public CollectionNames() {}
 
 
-    public String getUserCollection() {
-        return UserCollection;
+    public String getUserCollectionName() {
+        return USERS;
     }
 
-    public String getPostCollection() {
-        return PostCollection;
+    public String getPostCollectionName() {
+        return POSTS;
     }
 
-    public String getCommentCollection() {
-        return CommentCollection;
+    public String getCommentCollectionName() {
+        return COMMENTS;
     }
+
+    public String getPostCollectionListName() {return POST_COLLECTIONS;}
 }

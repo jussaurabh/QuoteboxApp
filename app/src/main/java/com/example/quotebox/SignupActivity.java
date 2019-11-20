@@ -26,15 +26,11 @@ import com.example.quotebox.interfaces.OnSignupSuccessListener;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -106,7 +102,7 @@ public class SignupActivity extends AppCompatActivity {
                     signupUsernameField.setBackgroundResource(R.color.transparent);
                     signupUsernameProgressBar.setVisibility(View.VISIBLE);
 
-                    firestore.collection(collectionNames.getUserCollection())
+                    firestore.collection(collectionNames.getUserCollectionName())
                             .whereEqualTo(Users.USERNAME, signupUsernameField.getText().toString().trim())
                             .get()
                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -251,11 +247,10 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onSignupSuccess(String uid, Users user) {
                         if (user != null) {
-                            signupSubmitBtn.setVisibility(View.VISIBLE);
-                            signupProgressBar.setVisibility(View.GONE);
-
                             finish();
                             startActivity(new Intent(SignupActivity.this, HomeActivity.class));
+                            signupSubmitBtn.setVisibility(View.VISIBLE);
+                            signupProgressBar.setVisibility(View.GONE);
                         }
                         else {
                             Toast.makeText(SignupActivity.this, "Error in SIgnup", Toast.LENGTH_LONG).show();

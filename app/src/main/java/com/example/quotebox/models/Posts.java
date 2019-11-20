@@ -21,7 +21,6 @@ public class Posts {
     public static final String POST = "post";
     public static final String POST_IMAGE = "postImage";
     public static final String POST_TYPE = "postType";
-    public static final String USER_ID = "userId";
     public static final String POST_LIKES = "postLikes";
     public static final String POST_COMMENTS = "postComments";
     public static final String POST_TIMESTAMP = "postTimestamp";

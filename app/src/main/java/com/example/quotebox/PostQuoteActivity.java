@@ -43,7 +43,6 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class PostQuoteActivity extends AppCompatActivity {
@@ -225,7 +224,7 @@ public class PostQuoteActivity extends AppCompatActivity {
 
 
     public void insertPostToDatabase(Posts post, final String uid) {
-        firestore.collection(collNames.getPostCollection())
+        firestore.collection(collNames.getPostCollectionName())
                 .add(post)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -236,7 +235,7 @@ public class PostQuoteActivity extends AppCompatActivity {
 
                             switch (getIntent().getStringExtra(Posts.POST_TYPE)) {
                                 case Posts.QUOTE_TYPE_POST: {
-                                    firestore.collection(collNames.getUserCollection())
+                                    firestore.collection(collNames.getUserCollectionName())
                                             .document(uid)
                                             .update(Users.NO_OF_QUOTES_POSTED, FieldValue.increment(1));
 
@@ -245,7 +244,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                                     break;
                                 }
                                 case Posts.POEM_TYPE_POST: {
-                                    firestore.collection(collNames.getUserCollection())
+                                    firestore.collection(collNames.getUserCollectionName())
                                             .document(uid)
                                             .update(Users.NO_OF_POEM_POSTED, FieldValue.increment(1));
 
@@ -254,7 +253,7 @@ public class PostQuoteActivity extends AppCompatActivity {
                                     break;
                                 }
                                 case Posts.STORY_TYPE_POST: {
-                                    firestore.collection(collNames.getUserCollection())
+                                    firestore.collection(collNames.getUserCollectionName())
                                             .document(uid)
                                             .update(Users.NO_OF_STORY_POSTED, FieldValue.increment(1));
 

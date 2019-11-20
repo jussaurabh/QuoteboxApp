@@ -19,7 +19,7 @@ public class CommentController extends CommentEventListeners {
 
     public CommentController() {
         this.firestore = FirebaseFirestore.getInstance();
-        this.commentCollection = new CollectionNames().getCommentCollection();
+        this.commentCollection = new CollectionNames().getCommentCollectionName();
         this.commentPostListener = null;
     }
 

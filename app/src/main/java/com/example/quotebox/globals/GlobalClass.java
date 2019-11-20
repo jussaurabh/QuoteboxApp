@@ -30,23 +30,15 @@ public class GlobalClass extends Application {
     private PoemPostsListener poemPostsListener;
     private StoryPostsListener storyPostsListener;
 
-    private boolean isUserLoggedIn = false;
     private Users loggedInUserData;
     private List<Posts> quotepostdata, poempostdata, storypostdata;
     private HashMap<String, Comments> allComments = new HashMap<>();
     private HashMap<String, Users> allUsers = new HashMap<>();
+    private HashMap<String, List<String>> loggedInUserPostCollection = new HashMap<>();
+    private CollectionNames collName = new CollectionNames();
 
     private FirebaseFirestore firestore;
 
-
-
-    public boolean isUserLoggedIn() {
-        return isUserLoggedIn;
-    }
-
-    public void setUserLoggedIn(boolean userLoggedIn) {
-        isUserLoggedIn = userLoggedIn;
-    }
 
     public Users getLoggedInUserData() {
         return loggedInUserData;
@@ -56,56 +48,10 @@ public class GlobalClass extends Application {
         this.loggedInUserData = loggedInUserData;
     }
 
-    public int incrementPostCount(String postType) {
-        switch (postType) {
-            case Posts.QUOTE_TYPE_POST: {
-                loggedInUserData.setNoOfQuotesPosted(loggedInUserData.getNoOfQuotesPosted() + 1);
-                break;
-            }
-            case Posts.POEM_TYPE_POST: {
-                loggedInUserData.setNoOfPoemPosted(loggedInUserData.getNoOfPoemPosted() + 1);
-                break;
-            }
-            case Posts.STORY_TYPE_POST: {
-                loggedInUserData.setNoOfStoryPosted(loggedInUserData.getNoOfStoryPosted() + 1);
-                break;
-            }
-        }
-
-        if (Posts.QUOTE_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfQuotesPosted();
-        if (Posts.POEM_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfPoemPosted();
-        if (Posts.STORY_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfStoryPosted();
-
-        return 0;
-    }
-
-    public int decrementPostCount(String postType) {
-        switch (postType) {
-            case Posts.QUOTE_TYPE_POST: {
-                loggedInUserData.setNoOfQuotesPosted(loggedInUserData.getNoOfQuotesPosted() - 1);
-                break;
-            }
-            case Posts.POEM_TYPE_POST: {
-                loggedInUserData.setNoOfPoemPosted(loggedInUserData.getNoOfPoemPosted() - 1);
-                break;
-            }
-            case Posts.STORY_TYPE_POST: {
-                loggedInUserData.setNoOfStoryPosted(loggedInUserData.getNoOfStoryPosted() - 1);
-                break;
-            }
-        }
-
-        if (Posts.QUOTE_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfQuotesPosted();
-        if (Posts.POEM_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfPoemPosted();
-        if (Posts.STORY_TYPE_POST.equals(postType)) return loggedInUserData.getNoOfStoryPosted();
-
-        return 0;
-    }
-
     public void setSelectedUserPosts(String userid) {
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection(new CollectionNames().getPostCollection())
-                .whereEqualTo(Posts.USER_ID, userid)
+        firestore.collection(new CollectionNames().getPostCollectionName())
+                .whereEqualTo(Users.USER_ID, userid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -120,7 +66,7 @@ public class GlobalClass extends Application {
                             post.setPostImage(docs.getString(Posts.POST_IMAGE));
                             post.setPostType(docs.getString(Posts.POST_TYPE));
                             post.setPostTitle(docs.getString(Posts.POST_TITLE));
-                            post.setUserId(docs.getString(Posts.USER_ID));
+                            post.setUserId(docs.getString(Users.USER_ID));
                             post.setPostUser(docs.getString(Posts.POST_USER));
                             post.setPostLikes((List<String>) docs.get(Posts.POST_LIKES));
                             post.setPostComments(Integer.parseInt(docs.get(Posts.POST_COMMENTS).toString()));
@@ -134,14 +80,6 @@ public class GlobalClass extends Application {
 
                     }
                 });
-    }
-
-    public List<Posts> getQuotePostData() {return quotepostdata;}
-
-    public List<Posts> getPoemPostData() {return poempostdata;}
-
-    public List<Posts> getStoryPostData() {
-        return storypostdata;
     }
 
     public void passQuotePosts(QuotePostsListener qpl) {
@@ -162,7 +100,7 @@ public class GlobalClass extends Application {
 
     public void setAllUsersData() {
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection(new CollectionNames().getUserCollection()).get()
+        firestore.collection(collName.getUserCollectionName()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -177,6 +115,7 @@ public class GlobalClass extends Application {
                             user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
                             user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
                             user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
+                            user.setUserPostCollections((HashMap<String, List<String>>) doc.get(Users.USER_POST_COLLECTIONS));
 
                             allUsers.put(doc.getId(), user);
                         }
@@ -197,4 +136,5 @@ public class GlobalClass extends Application {
     public void setAllComments(HashMap<String, Comments> allComments) {
         this.allComments = allComments;
     }
+
 }

@@ -11,12 +11,10 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
@@ -51,8 +49,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     List<Posts> allPostsList, quotepostdata, poempostdata, storypostdata;
     GlobalClass globalClass;
 
-    private boolean isHomeLoaded = false;
-
     private DrawerLayout drawerLayout;
     Toolbar toolbar;
     TextView nav_header_username, nav_header_email;
@@ -62,21 +58,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton homeFramentFloatingButton, poemPostFab, quotePostFab, storyPostFab;
     ConstraintLayout quoteFabWrapper, poemFabWrapper, storyFabWrapper;
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        this.isHomeLoaded = true;
-        Log.d("HOME_ACT_LOG", "onHOMePause");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (isHomeLoaded)
-            Log.d("HOME_ACT_LOG", "onResume");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,7 +215,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
 
     public void getUserData() {
-        firestore.collection(collectionNames.getUserCollection()).document(firebaseUser.getUid())
+        firestore.collection(collectionNames.getUserCollectionName()).document(firebaseUser.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

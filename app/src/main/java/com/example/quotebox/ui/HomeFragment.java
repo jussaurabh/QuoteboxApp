@@ -37,7 +37,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private FirebaseFirestore firestore;
+    private boolean isHomeFragmentLoaded = false;
 
     private PostController postController;
     private PostsAdapter postsAdapter;
@@ -47,10 +47,20 @@ public class HomeFragment extends Fragment {
 
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.d("HOME_FRAG", "on Home fragment onPause");
+
+        this.isHomeFragmentLoaded = true;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        firestore = FirebaseFirestore.getInstance();
+        Log.d("HOME_FRAG", "on Home fragment onCreated");
+
         postController = new PostController();
 
         postController.getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
@@ -70,6 +80,31 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (isHomeFragmentLoaded) {
+            Log.d("HOME_FRAG", "on Home fragment RESUME");
+            postController = new PostController();
+
+            postController.getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
+                @Override
+                public void onGetAllPost(List<Posts> postsList) {
+                    if (postsList.size() > 0) {
+                        homeRecyclerView.setVisibility(View.VISIBLE);
+                        homeFragProgressBar.setVisibility(View.GONE);
+                        postsAdapter = new PostsAdapter(getActivity(), postsList);
+                        homeRecyclerView.setAdapter(postsAdapter);
+                    }
+                    else {
+                        homeFragProgressBar.setVisibility(View.GONE);
+                        homeFragDefaultLL.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
+    }
 
     @Nullable
     @Override

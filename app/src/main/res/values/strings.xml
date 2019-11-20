@@ -20,10 +20,8 @@
     <string name="login_status_prefs">login_status_prefs</string>
     <!--  #####  -->
 
-    <!--    Collection Columns -->
-    <string name="username_column">username</string>
-    <string name="email_column">email</string>
-    <!--    ##### -->
+    <string name="undo">Undo</string>
+    <string name="change">Change</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>

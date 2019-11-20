@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class AuthController {
 
@@ -37,6 +39,9 @@ public class AuthController {
                         if (task.isSuccessful()) {
                             final String signUpUserId = task.getResult().getUser().getUid();
 
+                            HashMap<String, List<String>> userPostColl = new HashMap<>();
+                            userPostColl.put(Users.DEFAULT_POST_COLLECTION, new ArrayList<String>());
+
                             final Users users = new Users(
                                     username,
                                     email,
@@ -49,10 +54,11 @@ public class AuthController {
                                     0,
                                     0,
                                     new ArrayList<String>(),
-                                    new ArrayList<String>()
+                                    new ArrayList<String>(),
+                                    userPostColl
                             );
 
-                            firestore.collection(new CollectionNames().getUserCollection())
+                            firestore.collection(new CollectionNames().getUserCollectionName())
                                     .document(signUpUserId)
                                     .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -10,4 +10,5 @@
         android:fontFamily="@font/nunito_semibold"
         android:text="CheckBox"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
 </LinearLayout>

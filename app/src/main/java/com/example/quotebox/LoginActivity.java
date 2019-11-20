@@ -32,11 +32,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,7 +177,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d("LOGIN: ", "loginWithEmailAndPassword SUCCESS");
 
-                    finish();
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
                     loginProgressBar.setVisibility(View.GONE);
@@ -262,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful() && task.getResult() != null) {
                             final String gLoginUserId = task.getResult().getUser().getUid();
 
-                            firestore.collection(collectionNames.getUserCollection())
+                            firestore.collection(collectionNames.getUserCollectionName())
                                     .whereEqualTo(Users.EMAIL, account.getEmail())
                                     .get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -276,6 +272,8 @@ public class LoginActivity extends AppCompatActivity {
                                                 loginWithGoogleProgressBar.setVisibility(View.GONE);
                                             }
                                             else {
+                                                HashMap<String, List<String>> userPostColl = new HashMap<>();
+                                                userPostColl.put(Users.DEFAULT_POST_COLLECTION, new ArrayList<String>());
                                                 Users users = new Users(
                                                         account.getEmail().split("@")[0],
                                                         account.getEmail(),
@@ -288,10 +286,11 @@ public class LoginActivity extends AppCompatActivity {
                                                         0,
                                                         0,
                                                         new ArrayList<String>(),
-                                                        new ArrayList<String>()
+                                                        new ArrayList<String>(),
+                                                        userPostColl
                                                 );
 
-                                                firestore.collection(collectionNames.getUserCollection())
+                                                firestore.collection(collectionNames.getUserCollectionName())
                                                         .document(gLoginUserId)
                                                         .set(users)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {

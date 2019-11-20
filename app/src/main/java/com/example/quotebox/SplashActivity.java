@@ -50,7 +50,7 @@ public class SplashActivity extends AppCompatActivity {
         splashScreenTag = findViewById(R.id.splashScreenTag);
 
 
-//        firestore.collection(new CollectionNames().getUserCollection()).get()
+//        firestore.collection(new CollectionNames().getUserCollectionName()).get()
 //                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 //                    @Override
 //                    public void onComplete(@NonNull Task<QuerySnapshot> task) {

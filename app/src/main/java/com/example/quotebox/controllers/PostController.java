@@ -2,7 +2,6 @@ package com.example.quotebox.controllers;
 
 import androidx.annotation.NonNull;
 
-import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
@@ -33,7 +32,7 @@ public class PostController extends PostListeners {
 
     public PostController() {
         this.firestore = FirebaseFirestore.getInstance();
-        this.postCollection = new CollectionNames().getPostCollection();
+        this.postCollection = new CollectionNames().getPostCollectionName();
         getAllPostCompleteListener = null;
         getPostCompleteListener = null;
         postLikeUpdateListener = null;
@@ -59,7 +58,7 @@ public class PostController extends PostListeners {
                             }
                         });
 
-                firestore.collection(new CollectionNames().getUserCollection())
+                firestore.collection(new CollectionNames().getUserCollectionName())
                         .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .update(Users.FAV_POSTS, status ? FieldValue.arrayUnion(postid) : FieldValue.arrayRemove(postid));
 
@@ -85,7 +84,7 @@ public class PostController extends PostListeners {
                         post.setPostUser(doc.getString(Posts.POST_USER));
                         post.setPostImage(doc.getString(Posts.POST_IMAGE));
                         post.setPostTimestamp(doc.getTimestamp(Posts.POST_TIMESTAMP));
-                        post.setUserId(doc.getString(Posts.USER_ID));
+                        post.setUserId(doc.getString(Users.USER_ID));
                         post.setPostLikes((List<String>) doc.get(Posts.POST_LIKES));
                         post.setPostComments(Integer.parseInt(doc.get(Posts.POST_COMMENTS).toString()));
 
@@ -116,7 +115,7 @@ public class PostController extends PostListeners {
                                 post.setPostUser(doc.getString(Posts.POST_USER));
                                 post.setPostImage(doc.getString(Posts.POST_IMAGE));
                                 post.setPostTimestamp(doc.getTimestamp(Posts.POST_TIMESTAMP));
-                                post.setUserId(doc.getString(Posts.USER_ID));
+                                post.setUserId(doc.getString(Users.USER_ID));
                                 post.setPostLikes((List<String>) doc.get(Posts.POST_LIKES));
                                 post.setPostComments(Integer.parseInt(doc.get(Posts.POST_COMMENTS).toString()));
 
