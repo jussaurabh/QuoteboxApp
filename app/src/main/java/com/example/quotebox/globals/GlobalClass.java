@@ -35,7 +35,6 @@ public class GlobalClass extends Application {
     private HashMap<String, Comments> allComments = new HashMap<>();
     private HashMap<String, Users> allUsers = new HashMap<>();
     private HashMap<String, List<String>> loggedInUserPostCollection = new HashMap<>();
-    private CollectionNames collName = new CollectionNames();
 
     private FirebaseFirestore firestore;
 
@@ -50,7 +49,7 @@ public class GlobalClass extends Application {
 
     public void setSelectedUserPosts(String userid) {
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection(new CollectionNames().getPostCollectionName())
+        firestore.collection(CollectionNames.POSTS)
                 .whereEqualTo(Users.USER_ID, userid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -100,7 +99,7 @@ public class GlobalClass extends Application {
 
     public void setAllUsersData() {
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection(collName.getUserCollectionName()).get()
+        firestore.collection(CollectionNames.USERS).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {

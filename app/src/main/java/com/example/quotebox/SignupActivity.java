@@ -102,7 +102,7 @@ public class SignupActivity extends AppCompatActivity {
                     signupUsernameField.setBackgroundResource(R.color.transparent);
                     signupUsernameProgressBar.setVisibility(View.VISIBLE);
 
-                    firestore.collection(collectionNames.getUserCollectionName())
+                    firestore.collection(CollectionNames.USERS)
                             .whereEqualTo(Users.USERNAME, signupUsernameField.getText().toString().trim())
                             .get()
                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

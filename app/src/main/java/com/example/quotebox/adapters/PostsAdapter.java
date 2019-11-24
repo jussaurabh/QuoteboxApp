@@ -2,7 +2,6 @@ package com.example.quotebox.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,27 +13,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.quotebox.PostCollectionListActivity;
 import com.example.quotebox.PostCommentsActivity;
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
-import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
+import com.example.quotebox.ui.PostCollectionListDialogFragment;
 import com.example.quotebox.ui.ProfileFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
@@ -53,7 +49,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
     PostController postController;
-    CollectionNames collNames;
+    PostCollectionListDialogFragment postCollectionListDialogFragment;
+    FragmentManager fragmentManager;
 
     public PostsAdapter(Context context, List<Posts> posts) {
         this.context = context;
@@ -68,7 +65,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
         postController= new PostController();
-        collNames = new CollectionNames();
 
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
@@ -220,30 +216,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         holder.collectionAddImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-
-                context.startActivity(
-                        new Intent(
-                                context.getApplicationContext(),
-                                PostCollectionListActivity.class
-                        ).putExtra(Posts.POST_ID, postid)
-                );
-
-//                if (allUsersData.get(userid).getUserPostCollections().size() == 1) {
-//                    firestore.collection(collNames.getUserCollectionName())
-//                            .document(userid)
-//                            .update(Users.USER_POST_COLLECTIONS + "." + Users.DEFAULT_POST_COLLECTION, FieldValue.arrayUnion(postid))
-//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    holder.postCollectionBtnProgressBar.setVisibility(View.GONE);
-//                                    holder.postAddedToCollectionImageBtn.setVisibility(View.VISIBLE);
-//
-//                                }
-//                            });
-//                }
-//                else {
-//
-//                }
+                fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
+                postCollectionListDialogFragment = new PostCollectionListDialogFragment(postid);
+                postCollectionListDialogFragment.show(fragmentManager, "");
             }
         });
 
@@ -251,7 +226,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         holder.postAddedToCollectionImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                fragmentManager = ((AppCompatActivity)context).getSupportFragmentManager();
+                postCollectionListDialogFragment = new PostCollectionListDialogFragment(postid);
+                postCollectionListDialogFragment.show(fragmentManager, "");
             }
         });
 

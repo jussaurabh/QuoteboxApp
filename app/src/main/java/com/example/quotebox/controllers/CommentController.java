@@ -13,18 +13,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class CommentController extends CommentEventListeners {
 
     private FirebaseFirestore firestore;
-    private String commentCollection;
 
     private OnCommentPostListener commentPostListener;
 
     public CommentController() {
         this.firestore = FirebaseFirestore.getInstance();
-        this.commentCollection = new CollectionNames().getCommentCollectionName();
         this.commentPostListener = null;
     }
 
     public CommentController post(Comments comment) {
-        firestore.collection(commentCollection).add(comment)
+        firestore.collection(CollectionNames.COMMENTS).add(comment)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {

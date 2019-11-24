@@ -6,11 +6,6 @@
     android:orientation="vertical"
     tools:context=".PostCollectionListActivity">
 
-    <include
-        layout="@layout/quotebox_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,17 +76,34 @@
             android:layout_weight="1"
             android:background="@color/gray" />
 
-        <Button
-            android:id="@+id/selectedCollectionSubmitBtn"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorWhite"
-            android:drawableLeft="@drawable/ic_check_black"
-            android:drawablePadding="15dp"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:text="Done"
-            android:textAlignment="viewStart" />
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/selectedCollectionSubmitBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorWhite"
+                android:drawableLeft="@drawable/ic_check_black"
+                android:drawablePadding="15dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:text="Done"
+                android:textAlignment="viewStart" />
+
+            <ProgressBar
+                android:id="@+id/userCollSubmitProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingEnd="15dp"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </LinearLayout>
 

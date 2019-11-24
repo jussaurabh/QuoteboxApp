@@ -10,7 +10,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".PostCollectionListActivity"></activity>
         <activity android:name=".FavoritePostActivity" />
         <activity android:name=".PostCommentsActivity" />
         <activity android:name=".PostQuoteActivity" />

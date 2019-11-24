@@ -258,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful() && task.getResult() != null) {
                             final String gLoginUserId = task.getResult().getUser().getUid();
 
-                            firestore.collection(collectionNames.getUserCollectionName())
+                            firestore.collection(CollectionNames.USERS)
                                     .whereEqualTo(Users.EMAIL, account.getEmail())
                                     .get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -290,7 +290,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         userPostColl
                                                 );
 
-                                                firestore.collection(collectionNames.getUserCollectionName())
+                                                firestore.collection(CollectionNames.USERS)
                                                         .document(gLoginUserId)
                                                         .set(users)
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {

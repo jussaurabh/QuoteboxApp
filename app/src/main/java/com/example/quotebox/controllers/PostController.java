@@ -22,7 +22,6 @@ import java.util.List;
 public class PostController extends PostListeners {
 
     private FirebaseFirestore firestore;
-    private String postCollection;
     private List<Posts> allPosts;
     private Posts post;
 
@@ -32,7 +31,6 @@ public class PostController extends PostListeners {
 
     public PostController() {
         this.firestore = FirebaseFirestore.getInstance();
-        this.postCollection = new CollectionNames().getPostCollectionName();
         getAllPostCompleteListener = null;
         getPostCompleteListener = null;
         postLikeUpdateListener = null;
@@ -42,7 +40,7 @@ public class PostController extends PostListeners {
         getPost(postid).addOnGetPostCompleteListener(new OnGetPostCompleteListener() {
             @Override
             public void onGetPost(final Posts post) {
-                firestore.collection(postCollection).document(postid)
+                firestore.collection(CollectionNames.POSTS).document(postid)
                         .update(Posts.POST_LIKES, status ? FieldValue.arrayUnion(userid) : FieldValue.arrayRemove(userid))
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -58,7 +56,7 @@ public class PostController extends PostListeners {
                             }
                         });
 
-                firestore.collection(new CollectionNames().getUserCollectionName())
+                firestore.collection(CollectionNames.USERS)
                         .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .update(Users.FAV_POSTS, status ? FieldValue.arrayUnion(postid) : FieldValue.arrayRemove(postid));
 
@@ -70,7 +68,7 @@ public class PostController extends PostListeners {
     }
 
     public PostController getPost(String id) {
-        firestore.collection(postCollection).document(id).get()
+        firestore.collection(CollectionNames.POSTS).document(id).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -97,7 +95,7 @@ public class PostController extends PostListeners {
     }
 
     public PostController getAllPosts() {
-        firestore.collection(postCollection)
+        firestore.collection(CollectionNames.POSTS)
                 .orderBy(Posts.POST_TIMESTAMP, Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

@@ -66,7 +66,7 @@ public class FavoritePostActivity extends AppCompatActivity {
         userFavPostsRV.setLayoutManager(new LinearLayoutManager(this));
 
 
-        firestore.collection(new CollectionNames().getPostCollectionName())
+        firestore.collection(CollectionNames.POSTS)
                 .whereArrayContains(Posts.POST_LIKES, FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

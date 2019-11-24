@@ -26,6 +26,7 @@ import com.example.quotebox.ui.ProfileQuoteFragment;
 import com.example.quotebox.ui.ProfileStoryFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
@@ -55,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
         preferencesConfig = new SharedPreferencesConfig(this);
         globalClass = (GlobalClass) getApplicationContext();
+        globalClass.setSelectedUserPosts(getIntent().getStringExtra(Users.USER_ID));
 
         profileActUsernameTV = findViewById(R.id.profileActUsernameTV);
         profileActFollowersCountTV = findViewById(R.id.profileActUserFollowersCountTV);
@@ -87,7 +89,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        firestore.collection(new CollectionNames().getUserCollectionName()).document(getIntent().getStringExtra(Users.USER_ID))
+        firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

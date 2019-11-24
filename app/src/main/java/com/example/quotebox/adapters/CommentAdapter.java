@@ -1,5 +1,6 @@
 package com.example.quotebox.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quotebox.PostCommentsActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.models.Comments;

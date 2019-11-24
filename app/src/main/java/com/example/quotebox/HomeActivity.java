@@ -215,7 +215,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
 
     public void getUserData() {
-        firestore.collection(collectionNames.getUserCollectionName()).document(firebaseUser.getUid())
+        firestore.collection(CollectionNames.USERS).document(firebaseUser.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override

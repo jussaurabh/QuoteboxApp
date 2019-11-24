@@ -111,7 +111,7 @@ public class PostCommentsActivity extends AppCompatActivity {
     public void getSelectPost() {
         final String postid = getIntent().getStringExtra(Posts.POST_ID);
 
-        firestore.collection(collnames.getPostCollectionName())
+        firestore.collection(CollectionNames.POSTS)
                 .document(postid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -140,7 +140,7 @@ public class PostCommentsActivity extends AppCompatActivity {
 
 
     public void getPostComments() {
-        firestore.collection(collnames.getCommentCollectionName())
+        firestore.collection(CollectionNames.COMMENTS)
                 .whereEqualTo(Comments.POST_ID, getIntent().getStringExtra(Posts.POST_ID))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -219,7 +219,7 @@ public class PostCommentsActivity extends AppCompatActivity {
                 0
         );
 
-        firestore.collection(collnames.getCommentCollectionName()).add(cmnt)
+        firestore.collection(CollectionNames.COMMENTS).add(cmnt)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -238,7 +238,7 @@ public class PostCommentsActivity extends AppCompatActivity {
                         commentRecyclerView.setVisibility(View.VISIBLE);
                         cmntDefaultPlaceholderLL.setVisibility(View.GONE);
 
-                        firestore.collection(collnames.getPostCollectionName())
+                        firestore.collection(CollectionNames.POSTS)
                                 .document(postid)
                                 .update(Posts.POST_COMMENTS, FieldValue.increment(1));
                     }
@@ -247,4 +247,5 @@ public class PostCommentsActivity extends AppCompatActivity {
 
 
     public void onCommentUpdate(View v) {}
+
 }

@@ -58,7 +58,7 @@ public class AuthController {
                                     userPostColl
                             );
 
-                            firestore.collection(new CollectionNames().getUserCollectionName())
+                            firestore.collection(CollectionNames.USERS)
                                     .document(signUpUserId)
                                     .set(users)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
