@@ -1,11 +1,15 @@
 package com.example.quotebox;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +39,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -51,6 +56,10 @@ public class PostCommentsActivity extends AppCompatActivity {
     GlobalClass globalClass;
     CollectionNames collnames;
     CommentAdapter commentAdapter;
+    WriteBatch batch;
+
+    String cmntId = null;
+    int adaptPosition;
 
     Toolbar toolbar;
     LinearLayout cmntDefaultPlaceholderLL;
@@ -60,6 +69,7 @@ public class PostCommentsActivity extends AppCompatActivity {
     EditText commentEditText;
     ImageButton commentSubmitBtn;
     ProgressBar commentListProgressBar, commentSubmitProgressBar;
+    SwipeRefreshLayout commentSwipeRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +77,7 @@ public class PostCommentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_comments);
 
         firestore = FirebaseFirestore.getInstance();
+        batch = firestore.batch();
         globalClass = (GlobalClass) getApplicationContext();
         collnames = new CollectionNames();
 
@@ -83,6 +94,7 @@ public class PostCommentsActivity extends AppCompatActivity {
         commentListDefaultTV = findViewById(R.id.commentListDefaultTV);
         commentListProgressBar = findViewById(R.id.commentListProgressBar);
         commentSubmitProgressBar = findViewById(R.id.commentSubmitProgressBar);
+        commentSwipeRefresh = findViewById(R.id.commentSwipeRefresh);
 
         commentRecyclerView.setHasFixedSize(true);
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -103,6 +115,14 @@ public class PostCommentsActivity extends AppCompatActivity {
 
         getSelectPost();
         getPostComments();
+
+        commentSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getPostComments();
+                commentSwipeRefresh.setRefreshing(false);
+            }
+        });
 
 
     }
@@ -159,8 +179,6 @@ public class PostCommentsActivity extends AppCompatActivity {
                             cmnt.setUserId(doc.getString(Comments.USER_ID));
                             cmnt.setUserAvatar(doc.getString(Comments.USER_AVATAR));
                             cmnt.setUsername(doc.getString(Comments.USERNAME));
-                            cmnt.setLikesCount(Integer.parseInt(doc.get(Comments.LIKES_COUNT).toString()));
-                            cmnt.setDislikesCount(Integer.parseInt(doc.get(Comments.DISLIKES_COUNT).toString()));
 
                             comments.add(cmnt);
                             cmntsHashMap.put(doc.getId(), cmnt);
@@ -187,7 +205,7 @@ public class PostCommentsActivity extends AppCompatActivity {
     }
 
 
-    public void onCommentSubmit(View v) {
+    public void submitComment(View v) {
         String comment = commentEditText.getText().toString();
         String username = globalClass.getLoggedInUserData().getUsername();
         String userAvatar = globalClass.getLoggedInUserData().getUserAvatar();
@@ -214,9 +232,7 @@ public class PostCommentsActivity extends AppCompatActivity {
                 username,
                 comment,
                 Timestamp.now(),
-                postid,
-                0,
-                0
+                postid
         );
 
         firestore.collection(CollectionNames.COMMENTS).add(cmnt)
@@ -245,7 +261,56 @@ public class PostCommentsActivity extends AppCompatActivity {
                 });
     }
 
+    public void commentMenuDelete(final int position, String id) {
+        DocumentReference commentDocRef = firestore.collection(CollectionNames.COMMENTS).document(id);
+        batch.delete(commentDocRef);
 
-    public void onCommentUpdate(View v) {}
+        DocumentReference postDocRef = firestore.collection(CollectionNames.POSTS).document(getIntent().getStringExtra(Posts.POST_ID));
+        batch.update(postDocRef, Posts.POST_COMMENTS, FieldValue.increment(-1));
+
+        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                commentAdapter.notifyItemRemoved(position);
+            }
+        });
+    }
+
+
+    public void updateCommentDialog(final String cmnt, final String id, final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(PostCommentsActivity.this);
+
+        final EditText input = new EditText(PostCommentsActivity.this);
+        input.setText(cmnt);
+        input.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        builder.setView(input)
+                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        DocumentReference docRef = firestore.collection(CollectionNames.COMMENTS).document(id);
+
+                        batch.update(docRef, Comments.COMMENT, input.getText().toString());
+                        batch.update(docRef, Comments.COMMENT_TIMESTAMP, Timestamp.now());
+
+                        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                commentAdapter.notifyItemChanged(position);
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+
+        builder.create().show();
+    }
+
 
 }

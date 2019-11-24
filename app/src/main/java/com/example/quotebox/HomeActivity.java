@@ -251,6 +251,4 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         poemFabWrapper.setVisibility(View.GONE);
         storyFabWrapper.setVisibility(View.GONE);
     }
-
-
 }

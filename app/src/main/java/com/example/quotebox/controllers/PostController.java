@@ -119,6 +119,7 @@ public class PostController extends PostListeners {
 
                                 posts.add(post);
                             }
+
                             if (getAllPostCompleteListener != null)
                                 getAllPostCompleteListener.onGetAllPost(posts);
                         }

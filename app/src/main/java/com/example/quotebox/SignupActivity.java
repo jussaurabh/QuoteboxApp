@@ -75,8 +75,6 @@ public class SignupActivity extends AppCompatActivity {
         signupUsernameCheckImageView = findViewById(R.id.signupUsernameCheckImageView);
 
 
-
-
         signupEmailField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -278,6 +276,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
     public void goToLoginActivity(View view) {
+        finish();
         startActivity(new Intent(SignupActivity.this, LoginActivity.class));
     }
 

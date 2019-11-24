@@ -25,6 +25,7 @@ public class LandingActivity extends AppCompatActivity {
         goToLoginActivityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                finish();
                 startActivity(new Intent(LandingActivity.this, LoginActivity.class));
             }
         });
@@ -32,6 +33,7 @@ public class LandingActivity extends AppCompatActivity {
         goToSignupActivityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                finish();
                 startActivity(new Intent(LandingActivity.this, SignupActivity.class));
             }
         });

@@ -29,10 +29,10 @@ import java.util.List;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
-    private Context context;
+    private PostCommentsActivity context;
     private List<Comments> commentsList;
 
-    public CommentAdapter(Context context, List<Comments> cmntlist) {
+    public CommentAdapter(PostCommentsActivity context, List<Comments> cmntlist) {
         this.context = context;
         this.commentsList = cmntlist;
         Log.d("COMMENT_ADP_LOG", "" + cmntlist.size());
@@ -51,13 +51,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         Date date = new Date(commentsList.get(position).getCommentTimestamp().getSeconds() * 1000);
         String cmntDateStr = cmntDate.format(date);
 
-        Comments cmnt = commentsList.get(position);
+        final Comments cmnt = commentsList.get(position);
 
         holder.commentUsernameTV.setText(cmnt.getUsername());
         holder.commentDateTV.setText(cmntDateStr);
         holder.commentTV.setText(cmnt.getComment());
-        holder.commentLikeCountTV.setText(Integer.toString(cmnt.getLikesCount()));
-        holder.commentDislikeCountTV.setText(Integer.toString(cmnt.getDislikesCount()));
 
         if (commentsList.get(position).getUserAvatar() != null) {
             Picasso.get().load(commentsList.get(position).getUserAvatar())
@@ -79,9 +77,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
-                            case R.id.delete_Post:
+                            case R.id.delete_post: {
+                                context.commentMenuDelete(position, cmnt.getCommentId());
+                                commentsList.remove(position);
+                                break;
+                            }
                             case R.id.report_post:
-                            case R.id.edit_Post: {
+                            case R.id.edit_post: {
+                                context.updateCommentDialog(cmnt.getComment(), cmnt.getCommentId(), position);
                                 break;
                             }
                         }
@@ -94,6 +97,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             }
         });
 
+
     }
 
     @Override
@@ -104,8 +108,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     class CommentViewHolder extends RecyclerView.ViewHolder {
 
         ImageView commentUserAvatarImageView;
-        TextView commentUsernameTV, commentDateTV, commentTV, commentLikeCountTV, commentDislikeCountTV;
-        ImageButton commentLikeImageBtn, commentDislikeImageBtn, commentMenuImageBtn;
+        TextView commentUsernameTV, commentDateTV, commentTV;
+        ImageButton commentMenuImageBtn;
 
         public CommentViewHolder(@NonNull View iv) {
             super(iv);
@@ -114,10 +118,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             commentUsernameTV = iv.findViewById(R.id.commentUsernameTV);
             commentDateTV = iv.findViewById(R.id.commentDateTV);
             commentTV = iv.findViewById(R.id.commentTV);
-            commentLikeCountTV = iv.findViewById(R.id.commentLikeCountTV);
-            commentDislikeCountTV = iv.findViewById(R.id.commentDislikeCountTV);
-            commentLikeImageBtn = iv.findViewById(R.id.commentLikeImageBtn);
-            commentDislikeImageBtn = iv.findViewById(R.id.commentDislikeImageBtn);
             commentMenuImageBtn = iv.findViewById(R.id.commentMenuImageBtn);
         }
     }

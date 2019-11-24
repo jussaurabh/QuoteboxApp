@@ -23,6 +23,7 @@ import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
+import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.interfaces.PostListeners;
@@ -30,8 +31,13 @@ import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.PostCollectionListDialogFragment;
 import com.example.quotebox.ui.ProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -46,6 +52,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
     List<Posts> postsList;
 
     FirebaseFirestore firestore;
+    WriteBatch batch;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
     PostController postController;
@@ -57,11 +64,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         this.postsList = posts;
     }
 
+//    public PostsAdapter(List<Posts> pl) {
+//        this.postsList = pl;
+//    }
+
     @NonNull
     @Override
     public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         firestore = FirebaseFirestore.getInstance();
+        batch = firestore.batch();
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
         postController= new PostController();
@@ -176,13 +188,43 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             @Override
             public void onClick(View view) {
                 PopupMenu popup = new PopupMenu(context, holder.postCardMenuImageBtn);
-                popup.inflate(R.menu.post_card_menu);
+                popup.inflate(postsList.get(position).getUserId().equals(userid) ?
+                        R.menu.edit_or_delete_menu : R.menu.post_card_menu);
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.report_post: {
+                                break;
+                            }
+                            case R.id.delete_post: {
+                                DocumentReference postDocRef = firestore.collection(CollectionNames.POSTS).document(postid);
+                                batch.delete(postDocRef);
+
+                                DocumentReference userDocRef = firestore.collection(CollectionNames.USERS).document(userid);
+                                switch (postsList.get(position).getPostType()) {
+                                    case Posts.QUOTE_TYPE_POST: {
+                                        batch.update(userDocRef, Users.NO_OF_QUOTES_POSTED, FieldValue.increment(-1));
+                                        break;
+                                    }
+                                    case Posts.POEM_TYPE_POST: {
+                                        batch.update(userDocRef, Users.NO_OF_POEM_POSTED, FieldValue.increment(-1));
+                                        break;
+                                    }
+                                    case Posts.STORY_TYPE_POST: {
+                                        batch.update(userDocRef, Users.NO_OF_STORY_POSTED, FieldValue.increment(-1));
+                                        break;
+                                    }
+                                }
+
+                                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        postsList.remove(postid);
+                                    }
+                                });
+
                                 break;
                             }
                         }

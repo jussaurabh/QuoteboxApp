@@ -34,10 +34,17 @@ public class GlobalClass extends Application {
     private List<Posts> quotepostdata, poempostdata, storypostdata;
     private HashMap<String, Comments> allComments = new HashMap<>();
     private HashMap<String, Users> allUsers = new HashMap<>();
-    private HashMap<String, List<String>> loggedInUserPostCollection = new HashMap<>();
+    HashMap<String, Posts> allPosts = new HashMap<>();
 
     private FirebaseFirestore firestore;
 
+    public void setAllPosts(HashMap<String, Posts> p) {
+        this.allPosts = p;
+    }
+
+    public HashMap<String, Posts> getAllPosts() {
+        return allPosts;
+    }
 
     public Users getLoggedInUserData() {
         return loggedInUserData;

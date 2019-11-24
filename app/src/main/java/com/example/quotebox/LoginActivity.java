@@ -82,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         loginGoToSignupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                finish();
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             }
         });
@@ -177,6 +178,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Log.d("LOGIN: ", "loginWithEmailAndPassword SUCCESS");
 
+                    finish();
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
                     loginProgressBar.setVisibility(View.GONE);
@@ -247,8 +249,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
-        Log.d("TAG", "firebaseAuthWithGoogle: " + account.getEmail() + " " + account.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
 
         mAuth.signInWithCredential(credential)

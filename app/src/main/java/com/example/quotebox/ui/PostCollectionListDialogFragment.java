@@ -3,6 +3,7 @@ package com.example.quotebox.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 
@@ -27,6 +29,7 @@ import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -47,9 +50,10 @@ public class PostCollectionListDialogFragment extends DialogFragment {
     WriteBatch batch = firestore.batch();
     DocumentReference docRef = firestore.collection(CollectionNames.USERS).document(LOGGED_IN_USER_ID);
 
-    Button createNewCollectionBtn, selectedCollectionSubmitBtn;
+    Button createNewCollectionBtn, selectedCollectionSubmitBtn, closeCollectionDialogBtn, saveNewCollectionBtn;
     RecyclerView collectionNamesRL;
-    ProgressBar userCollSubmitProgressBar;
+    ProgressBar userCollSubmitProgressBar, saveNewCollProgressBar;
+    EditText newCollectionNameET;
 
     final String SELECTED_POST_ID;
     HashMap<String, List<String>> userCollList, copyUserCollList;
@@ -57,18 +61,6 @@ public class PostCollectionListDialogFragment extends DialogFragment {
 
     public PostCollectionListDialogFragment(String id) {
         this.SELECTED_POST_ID = id;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("PDL", "Dialog onStart");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("PDL", "Dialog onDestroy");
     }
 
     @NonNull
@@ -85,9 +77,13 @@ public class PostCollectionListDialogFragment extends DialogFragment {
 
         builder.setView(view);
 
+        saveNewCollProgressBar = view.findViewById(R.id.saveNewCollProgressBar);
+        closeCollectionDialogBtn = view.findViewById(R.id.closeCollectionDialogBtn);
+        saveNewCollectionBtn = view.findViewById(R.id.saveNewCollectionBtn);
         createNewCollectionBtn = view.findViewById(R.id.createNewCollectionBtn);
         selectedCollectionSubmitBtn = view.findViewById(R.id.selectedCollectionSubmitBtn);
         userCollSubmitProgressBar = view.findViewById(R.id.userCollSubmitProgressBar);
+        newCollectionNameET = view.findViewById(R.id.newCollectionNameET);
         collectionNamesRL = view.findViewById(R.id.collectionNamesRL);
         collectionNamesRL.setHasFixedSize(true);
         collectionNamesRL.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -98,7 +94,6 @@ public class PostCollectionListDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 Log.d("PCD", new Gson().toJson(userCollList));
-
                 userCollSubmitProgressBar.setVisibility(View.VISIBLE);
 
                 batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -118,7 +113,62 @@ public class PostCollectionListDialogFragment extends DialogFragment {
             }
         });
 
+        createNewCollectionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newCollectionDialog();
+            }
+        });
+
         return builder.create();
+    }
+
+
+    public void newCollectionDialog() {
+        collectionNamesRL.setVisibility(View.GONE);
+        selectedCollectionSubmitBtn.setVisibility(View.GONE);
+        newCollectionNameET.setVisibility(View.VISIBLE);
+        closeCollectionDialogBtn.setVisibility(View.VISIBLE);
+        saveNewCollectionBtn.setVisibility(View.VISIBLE);
+
+//        final String newCollName = newCollectionNameET.getText().toString();
+
+        closeCollectionDialogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                collectionNamesRL.setVisibility(View.VISIBLE);
+                selectedCollectionSubmitBtn.setVisibility(View.VISIBLE);
+                newCollectionNameET.setVisibility(View.GONE);
+                closeCollectionDialogBtn.setVisibility(View.GONE);
+                saveNewCollectionBtn.setVisibility(View.GONE);
+            }
+        });
+
+        saveNewCollectionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeCollectionDialogBtn.setVisibility(View.GONE);
+                saveNewCollectionBtn.setVisibility(View.GONE);
+                saveNewCollProgressBar.setVisibility(View.VISIBLE);
+
+                final String newCollName = newCollectionNameET.getText().toString();
+
+                firestore.collection(CollectionNames.USERS).document(LOGGED_IN_USER_ID)
+                        .update(Users.USER_POST_COLLECTIONS + "." + newCollName, FieldValue.arrayUnion(SELECTED_POST_ID))
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    List<String> l = new ArrayList<>();
+                                    l.add(SELECTED_POST_ID);
+                                    userCollList.put(newCollName, l);
+
+                                    dismiss();
+                                }
+                            }
+                        });
+            }
+        });
     }
 
 

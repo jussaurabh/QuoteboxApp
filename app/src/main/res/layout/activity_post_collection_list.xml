@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".PostCollectionListActivity">
+    android:orientation="vertical">
+<!--    tools:context=".PostCollectionListActivity">-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,6 +57,18 @@
         android:paddingStart="15dp"
         android:paddingEnd="15dp">
 
+
+        <EditText
+            android:id="@+id/newCollectionNameET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:ems="10"
+            android:hint="New collection name"
+            android:inputType="textPersonName"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collectionNamesRL"
             android:layout_width="match_parent"
@@ -102,6 +114,35 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingEnd="15dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/closeCollectionDialogBtn"
+                style="@style/transparentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@android:string/cancel"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/saveNewCollectionBtn"
+                style="@style/transparentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/saveNewCollProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:visibility="gone" />
         </LinearLayout>
 

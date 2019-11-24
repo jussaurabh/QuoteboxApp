@@ -23,6 +23,8 @@ public class Users {
 
     public static final String USER_POST_COLLECTIONS = "userPostCollections";
     public static final String DEFAULT_POST_COLLECTION = "Favorites";
+    public static final String COLLECTION_NAME = "collName";
+    public static final String POSTS_IN_COLLECTION = "postCountInCollection";
 
 
     private String username;

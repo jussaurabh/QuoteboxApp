@@ -10,8 +10,6 @@ public class Comments {
     public static final String COMMENT = "comment";
     public static final String COMMENT_TIMESTAMP = "commentTimestamp";
     public static final String POST_ID = "postId";
-    public static final String LIKES_COUNT = "likesCount";
-    public static final String DISLIKES_COUNT = "dislikesCount";
     public static final String COMMENT_ID = "commentId";
 
     private String userId;
@@ -20,8 +18,6 @@ public class Comments {
     private String comment;
     private Timestamp commentTimestamp;
     private String postId;
-    private int likesCount;
-    private int dislikesCount;
     private String commentId;
 
 
@@ -33,9 +29,7 @@ public class Comments {
         String username,
         String comment,
         Timestamp commentTimestamp,
-        String postId,
-        int likesCount,
-        int dislikesCount
+        String postId
     ) {
         this.userId = userId;
         this.userAvatar = userAvatar;
@@ -43,8 +37,6 @@ public class Comments {
         this.comment = comment;
         this.commentTimestamp = commentTimestamp;
         this.postId = postId;
-        this.likesCount = likesCount;
-        this.dislikesCount = dislikesCount;
     }
 
 
@@ -86,22 +78,6 @@ public class Comments {
 
     public void setPostId(String postId) {
         this.postId = postId;
-    }
-
-    public int getLikesCount() {
-        return likesCount;
-    }
-
-    public void setLikesCount(int likesCount) {
-        this.likesCount = likesCount;
-    }
-
-    public int getDislikesCount() {
-        return dislikesCount;
-    }
-
-    public void setDislikesCount(int dislikesCount) {
-        this.dislikesCount = dislikesCount;
     }
 
     public String getCommentId() {
