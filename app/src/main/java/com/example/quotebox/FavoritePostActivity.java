@@ -80,7 +80,7 @@ public class FavoritePostActivity extends AppCompatActivity {
                                 List<Posts> postsList = new ArrayList<>();
                                 for (QueryDocumentSnapshot docs : task.getResult()) {
                                     Posts post = new Posts();
-                                    post.setPostId(docs.getId());
+                                    post._setPostId(docs.getId());
                                     post.setPost(docs.getString(Posts.POST));
                                     post.setPostImage(docs.getString(Posts.POST_IMAGE));
                                     post.setPostType(docs.getString(Posts.POST_TYPE));

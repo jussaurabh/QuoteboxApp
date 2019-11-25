@@ -4,12 +4,8 @@ import com.google.firebase.Timestamp;
 
 public class Comments {
 
-    public static final String USER_ID = "userId";
-    public static final String USER_AVATAR = "userAvatar";
-    public static final String USERNAME = "username";
     public static final String COMMENT = "comment";
     public static final String COMMENT_TIMESTAMP = "commentTimestamp";
-    public static final String POST_ID = "postId";
     public static final String COMMENT_ID = "commentId";
 
     private String userId;
@@ -25,15 +21,11 @@ public class Comments {
 
     public Comments(
         String userId,
-        String userAvatar,
-        String username,
         String comment,
         Timestamp commentTimestamp,
         String postId
     ) {
         this.userId = userId;
-        this.userAvatar = userAvatar;
-        this.username = username;
         this.comment = comment;
         this.commentTimestamp = commentTimestamp;
         this.postId = postId;
@@ -46,22 +38,6 @@ public class Comments {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getUserAvatar() {
-        return userAvatar;
-    }
-
-    public void setUserAvatar(String userAvatar) {
-        this.userAvatar = userAvatar;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getComment() {
@@ -80,11 +56,11 @@ public class Comments {
         this.postId = postId;
     }
 
-    public String getCommentId() {
+    public String _getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(String _commentId) {
+    public void _setCommentId(String _commentId) {
         this.commentId = _commentId;
     }
 
@@ -94,5 +70,21 @@ public class Comments {
 
     public void setCommentTimestamp(Timestamp commentTimestamp) {
         this.commentTimestamp = commentTimestamp;
+    }
+
+    public String _getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void _setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
+    }
+
+    public String _getUsername() {
+        return username;
+    }
+
+    public void _setUsername(String username) {
+        this.username = username;
     }
 }

@@ -87,7 +87,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         final HashMap<String, Users> allUsersData = globalClass.getAllUsersData();
         final Users loggedInUserData = globalClass.getLoggedInUserData();
         final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final String postid = postsList.get(position).getPostId();
+        final String postid = postsList.get(position)._getPostId();
 
         Date d = new Date(postsList.get(position).getPostTimestamp().getSeconds() * 1000);
         DateFormat dateFormat = new SimpleDateFormat("MMM d, ''yy");
@@ -107,11 +107,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
         final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
 
-        if (allUsersData.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
-            Picasso.get().load(allUsersData.get(postsList.get(position).getUserId()).getUserAvatar())
-                    .transform(new ImageCircleTransform())
-                    .into(holder.authorAvatarIV);
-        }
+//        if (allUsersData.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
+//            Picasso.get().load(allUsersData.get(postsList.get(position).getUserId()).getUserAvatar())
+//                    .transform(new ImageCircleTransform())
+//                    .into(holder.authorAvatarIV);
+//        }
 
         holder.authorUsernameTV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +137,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
             public void onClick(View view) {
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.favoriteImageBtn.setVisibility(View.GONE);
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), userid, true)
+                postController.updatePostLikeCount(postsList.get(position)._getPostId(), userid, true)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -160,7 +160,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                 holder.postFavBtnProgressBar.setVisibility(View.VISIBLE);
                 holder.unFavoriteIB.setVisibility(View.GONE);
 
-                postController.updatePostLikeCount(postsList.get(position).getPostId(), userid, false)
+                postController.updatePostLikeCount(postsList.get(position)._getPostId(), userid, false)
                         .addOnPostLikeUpdateListener(new PostListeners.OnPostLikeUpdateListener() {
                             @Override
                             public void onPostLikeUpdate(int postLikeCount) {
@@ -178,7 +178,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         });
 
 
-        if (allUsersData.get(userid).getFavPosts().contains(postsList.get(position).getPostId())) {
+        if (allUsersData.get(userid).getFavPosts().contains(postsList.get(position)._getPostId())) {
             holder.favoriteImageBtn.setVisibility(View.GONE);
             holder.unFavoriteIB.setVisibility(View.VISIBLE);
         }

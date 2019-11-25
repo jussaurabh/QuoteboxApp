@@ -93,7 +93,7 @@ public class PostCollectionListDialogFragment extends DialogFragment {
         selectedCollectionSubmitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("PCD", new Gson().toJson(userCollList));
+                selectedCollectionSubmitBtn.setVisibility(View.GONE);
                 userCollSubmitProgressBar.setVisibility(View.VISIBLE);
 
                 batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -102,6 +102,10 @@ public class PostCollectionListDialogFragment extends DialogFragment {
                         if (task.isSuccessful()) {
                             userCollSubmitProgressBar.setVisibility(View.GONE);
                             globalClass.getAllUsersData().get(LOGGED_IN_USER_ID).setUserPostCollections(copyUserCollList);
+
+                            selectedCollectionSubmitBtn.setVisibility(View.VISIBLE);
+                            userCollSubmitProgressBar.setVisibility(View.GONE);
+
                             dismiss();
                         }
                         else {

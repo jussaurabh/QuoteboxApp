@@ -113,11 +113,11 @@ public class Posts {
         this.postComments = postComments;
     }
 
-    public String getPostId() {
+    public String _getPostId() {
         return postId;
     }
 
-    public void setPostId(String postId) {
+    public void _setPostId(String postId) {
         this.postId = postId;
     }
 

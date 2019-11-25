@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment {
                     HashMap<String, Posts> allposts = new HashMap<>();
 
                     for (Posts p : postsList) {
-                        allposts.put(p.getPostId(), p);
+                        allposts.put(p._getPostId(), p);
                     }
 
                     globalClass.setAllPosts(allposts);
@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
                     HashMap<String, Posts> allposts = new HashMap<>();
 
                     for (Posts p : postsList) {
-                        allposts.put(p.getPostId(), p);
+                        allposts.put(p._getPostId(), p);
                     }
 
                     globalClass.setAllPosts(allposts);
@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment {
                         HashMap<String, Posts> allposts = new HashMap<>();
 
                         for (Posts p : postsList) {
-                            allposts.put(p.getPostId(), p);
+                            allposts.put(p._getPostId(), p);
                         }
 
                         globalClass.setAllPosts(allposts);
@@ -133,7 +133,7 @@ public class HomeFragment extends Fragment {
                         HashMap<String, Posts> allposts = new HashMap<>();
 
                         for (Posts p : postsList) {
-                            allposts.put(p.getPostId(), p);
+                            allposts.put(p._getPostId(), p);
                         }
 
                         globalClass.setAllPosts(allposts);

@@ -28,6 +28,7 @@ import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.models.Comments;
 import com.example.quotebox.models.Posts;
+import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -54,12 +55,12 @@ public class PostCommentsActivity extends AppCompatActivity {
 
     FirebaseFirestore firestore;
     GlobalClass globalClass;
-    CollectionNames collnames;
     CommentAdapter commentAdapter;
     WriteBatch batch;
 
     String cmntId = null;
     int adaptPosition;
+    HashMap<String, Users> allUserData = new HashMap<>();
 
     Toolbar toolbar;
     LinearLayout cmntDefaultPlaceholderLL;
@@ -79,7 +80,7 @@ public class PostCommentsActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
         batch = firestore.batch();
         globalClass = (GlobalClass) getApplicationContext();
-        collnames = new CollectionNames();
+        allUserData = globalClass.getAllUsersData();
 
         cmntDefaultPlaceholderLL = findViewById(R.id.cmntDefaultPlaceholderLL);
         cmntPostUserAvatarImageView = findViewById(R.id.cmntPostUserAvatarImageView);
@@ -161,7 +162,7 @@ public class PostCommentsActivity extends AppCompatActivity {
 
     public void getPostComments() {
         firestore.collection(CollectionNames.COMMENTS)
-                .whereEqualTo(Comments.POST_ID, getIntent().getStringExtra(Posts.POST_ID))
+                .whereEqualTo(Posts.POST_ID, getIntent().getStringExtra(Posts.POST_ID))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -171,14 +172,16 @@ public class PostCommentsActivity extends AppCompatActivity {
                         HashMap<String, Comments> cmntsHashMap = new HashMap<>();
 
                         for (QueryDocumentSnapshot doc : task.getResult()) {
+                            String uid = doc.getString(Users.USER_ID);
+
                             Comments cmnt = new Comments();
-                            cmnt.setCommentId(doc.getId());
+                            cmnt._setCommentId(doc.getId());
                             cmnt.setComment(doc.getString(Comments.COMMENT));
                             cmnt.setCommentTimestamp(doc.getTimestamp(Comments.COMMENT_TIMESTAMP));
-                            cmnt.setPostId(doc.getString(Comments.POST_ID));
-                            cmnt.setUserId(doc.getString(Comments.USER_ID));
-                            cmnt.setUserAvatar(doc.getString(Comments.USER_AVATAR));
-                            cmnt.setUsername(doc.getString(Comments.USERNAME));
+                            cmnt.setPostId(doc.getString(Posts.POST_ID));
+                            cmnt.setUserId(uid);
+                            cmnt._setUsername(allUserData.get(uid).getUsername());
+                            cmnt._setUserAvatar(allUserData.get(uid).getUserAvatar());
 
                             comments.add(cmnt);
                             cmntsHashMap.put(doc.getId(), cmnt);
@@ -207,29 +210,19 @@ public class PostCommentsActivity extends AppCompatActivity {
 
     public void submitComment(View v) {
         String comment = commentEditText.getText().toString();
-        String username = globalClass.getLoggedInUserData().getUsername();
-        String userAvatar = globalClass.getLoggedInUserData().getUserAvatar();
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         final String postid = getIntent().getStringExtra(Posts.POST_ID);
 
         if (comment.isEmpty()) {
-            Toast.makeText(
-                    PostCommentsActivity.this,
-                    "Please enter any comment",
-                    Toast.LENGTH_LONG
-            ).show();
-
+            Toast.makeText(PostCommentsActivity.this,"Please enter any comment", Toast.LENGTH_LONG).show();
             return;
         }
-
 
         commentSubmitBtn.setVisibility(View.GONE);
         commentSubmitProgressBar.setVisibility(View.VISIBLE);
 
         final Comments cmnt = new Comments(
                 userid,
-                userAvatar,
-                username,
                 comment,
                 Timestamp.now(),
                 postid
@@ -244,7 +237,10 @@ public class PostCommentsActivity extends AppCompatActivity {
                         commentSubmitBtn.setVisibility(View.VISIBLE);
                         commentSubmitProgressBar.setVisibility(View.GONE);
 
-                        cmnt.setCommentId(documentReference.getId());
+                        cmnt._setCommentId(documentReference.getId());
+                        cmnt._setUserAvatar(allUserData.get(userid).getUserAvatar());
+                        cmnt._setUsername(allUserData.get(userid).getUsername());
+
                         List<Comments> updatedCmnts = new ArrayList<>(globalClass.getAllComments().values());
                         updatedCmnts.add(0, cmnt);
 

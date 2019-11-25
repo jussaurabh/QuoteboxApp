@@ -16,5 +16,5 @@
     app:titleMargin="0dp"
     app:titleTextAppearance="@style/TextAppearance.AppCompat.Large"
     app:titleTextColor="@color/colorWhite"
-    android:elevation="4dp"
-    app:menu="@menu/toolbar_menu"/>
+    android:elevation="4dp"/>
+<!--    app:menu="@menu/toolbar_menu"/>-->

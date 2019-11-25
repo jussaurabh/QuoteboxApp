@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_account_privacy"
+        android:summary="@string/pref_account_privacy_summary"
+        android:title="@string/pref_account_privacy"
+        app:iconSpaceReserved="false" />
+</PreferenceScreen>

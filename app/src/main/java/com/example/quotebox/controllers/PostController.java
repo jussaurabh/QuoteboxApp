@@ -75,7 +75,7 @@ public class PostController extends PostListeners {
                         DocumentSnapshot doc = task.getResult();
 
                         Posts post = new Posts();
-                        post.setPostId(doc.getId());
+                        post._setPostId(doc.getId());
                         post.setPost(doc.getString(Posts.POST));
                         post.setPostType(doc.getString(Posts.POST_TYPE));
                         post.setPostTitle(doc.getString(Posts.POST_TITLE));
@@ -106,7 +106,7 @@ public class PostController extends PostListeners {
 
                             for (QueryDocumentSnapshot doc : task.getResult()) {
                                 Posts post = new Posts();
-                                post.setPostId(doc.getId());
+                                post._setPostId(doc.getId());
                                 post.setPost(doc.getString(Posts.POST));
                                 post.setPostType(doc.getString(Posts.POST_TYPE));
                                 post.setPostTitle(doc.getString(Posts.POST_TITLE));

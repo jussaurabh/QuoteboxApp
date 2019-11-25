@@ -46,19 +46,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     @Override
     public void onBindViewHolder(@NonNull final CommentViewHolder holder, final int position) {
-
-        DateFormat cmntDate = new SimpleDateFormat("MMM d, ''yy");
-        Date date = new Date(commentsList.get(position).getCommentTimestamp().getSeconds() * 1000);
-        String cmntDateStr = cmntDate.format(date);
-
         final Comments cmnt = commentsList.get(position);
 
-        holder.commentUsernameTV.setText(cmnt.getUsername());
+        DateFormat cmntDate = new SimpleDateFormat("MMM d, ''yy");
+        Date date = new Date(cmnt.getCommentTimestamp().getSeconds() * 1000);
+        String cmntDateStr = cmntDate.format(date);
+
+
+        holder.commentUsernameTV.setText(cmnt._getUsername());
         holder.commentDateTV.setText(cmntDateStr);
         holder.commentTV.setText(cmnt.getComment());
 
-        if (commentsList.get(position).getUserAvatar() != null) {
-            Picasso.get().load(commentsList.get(position).getUserAvatar())
+        if (commentsList.get(position)._getUserAvatar() != null) {
+            Picasso.get().load(commentsList.get(position)._getUserAvatar())
                     .transform(new ImageCircleTransform())
                     .into(holder.commentUserAvatarImageView);
         }
@@ -78,13 +78,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.delete_post: {
-                                context.commentMenuDelete(position, cmnt.getCommentId());
+                                context.commentMenuDelete(position, cmnt._getCommentId());
                                 commentsList.remove(position);
                                 break;
                             }
                             case R.id.report_post:
                             case R.id.edit_post: {
-                                context.updateCommentDialog(cmnt.getComment(), cmnt.getCommentId(), position);
+                                context.updateCommentDialog(cmnt.getComment(), cmnt._getCommentId(), position);
                                 break;
                             }
                         }
