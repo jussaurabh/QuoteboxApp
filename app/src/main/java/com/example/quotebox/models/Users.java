@@ -20,6 +20,7 @@ public class Users {
     public static final String FAV_POSTS = "favPosts";
     public static final String FOLLOWER_USERS = "followerUsers";
     public static final String FOLLOWING_USERS = "followingUsers";
+    public static final String IS_PRIVATE_PROFILE = "privateProfile";
 
     public static final String USER_POST_COLLECTIONS = "userPostCollections";
     public static final String DEFAULT_POST_COLLECTION = "Favorites";
@@ -40,6 +41,7 @@ public class Users {
     private List<String> followerUsers;
     private List<String> followingUsers;
     private HashMap<String, List<String>> userPostCollections;
+    private boolean isPrivateProfile;
 
     public Users() { }
 
@@ -55,7 +57,8 @@ public class Users {
                  int noOfStoryPosted,
                  List<String> followerUsers,
                  List<String> followingUsers,
-                 HashMap<String, List<String>> userPostCollections) {
+                 HashMap<String, List<String>> userPostCollections,
+                 boolean isprivate) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -69,6 +72,7 @@ public class Users {
         this.followerUsers = followerUsers;
         this.followingUsers = followingUsers;
         this.userPostCollections = userPostCollections;
+        this.isPrivateProfile = isprivate;
     }
 
     public String getUsername() {
@@ -174,4 +178,20 @@ public class Users {
     public void setUserPostCollections(HashMap<String, List<String>> userPostCollections) {
         this.userPostCollections = userPostCollections;
     }
+
+    public boolean isPrivateProfile() {
+        return isPrivateProfile;
+    }
+
+    public void setPrivateProfile(boolean privateProfile) {
+        isPrivateProfile = privateProfile;
+    }
+
+//    public boolean isProfilePrivate() {
+//        return isProfilePrivate;
+//    }
+//
+//    public void setProfilePrivate(boolean profilePrivate) {
+//        isProfilePrivate = profilePrivate;
+//    }
 }

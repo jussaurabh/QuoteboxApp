@@ -27,8 +27,12 @@ import com.example.quotebox.ui.ProfileStoryFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -38,13 +42,15 @@ import java.util.Locale;
 public class ProfileActivity extends AppCompatActivity {
 
     FirebaseFirestore firestore;
+    WriteBatch batch;
+    String LOGGED_IN_UID;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
 
     Toolbar toolbar;
     TextView profileActUsernameTV, profileActFollowersCountTV, profileActFollowingsCountTV, profileActLikesCountTV;
     ImageView profileActUserAvatarIV;
-    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL;
+    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL, postTabsWrapperLL;
     Button followUserBtn, followingUserBtn, profileActQuoteCountBtn, profileActPoemCountBtn, profileActStoryCountBtn;
     ProgressBar followBtnProgressBar;
 
@@ -54,9 +60,14 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         firestore = FirebaseFirestore.getInstance();
+        LOGGED_IN_UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        batch = firestore.batch();
         preferencesConfig = new SharedPreferencesConfig(this);
         globalClass = (GlobalClass) getApplicationContext();
         globalClass.setSelectedUserPosts(getIntent().getStringExtra(Users.USER_ID));
+
+        final DocumentReference followingDoc = firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID));
+        final DocumentReference followerDoc = firestore.collection(CollectionNames.USERS).document(LOGGED_IN_UID);
 
         profileActUsernameTV = findViewById(R.id.profileActUsernameTV);
         profileActFollowersCountTV = findViewById(R.id.profileActUserFollowersCountTV);
@@ -72,8 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileActPoemCountBtn = findViewById(R.id.profileActPoemCountBtn);
         profileActStoryCountBtn = findViewById(R.id.profileActStoryCountBtn);
         followBtnProgressBar = findViewById(R.id.followBtnProgressBar);
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
+        postTabsWrapperLL = findViewById(R.id.postTabsWrapperLL);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -89,45 +99,49 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID))
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        getProfileUserDetails();
+
+
+        followUserBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                followUserBtn.setVisibility(View.GONE);
+                followBtnProgressBar.setVisibility(View.VISIBLE);
+
+                batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayUnion(getIntent().getStringExtra(Users.USER_ID)));
+                batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayUnion(LOGGED_IN_UID));
+
+                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot doc = task.getResult();
-
-                        Users user = new Users();
-                        user.setUserAvatar(doc.getString(Users.USERAVATAR));
-                        user.setUsername(doc.getString(Users.USERNAME));
-                        user.setNoOfStoryPosted(Integer.parseInt(doc.get(Users.NO_OF_STORY_POSTED).toString()));
-                        user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
-                        user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
-                        user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
-                        user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
-                        user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
-
-                        Log.d("PROFILE_ACT_LOG", "user profile: " + new Gson().toJson(user));
-
-                        if (user.getUserAvatar() != null) {
-                            Picasso.get().load(user.getUserAvatar())
-                                    .transform(new ImageCircleTransform())
-                                    .into(profileActUserAvatarIV);
-                        }
-
-                        profileActUsernameTV.setText(user.getUsername());
-                        profileActFollowersCountTV.setText(Integer.toString(user.getFollowerUsers().size()));
-                        profileActFollowingsCountTV.setText(Integer.toString(user.getFollowingUsers().size()));
-                        profileActLikesCountTV.setText(Integer.toString(user.getFavPosts().size()));
-
-                        String poemCount = String.format(Locale.getDefault(), "Poems (%d)", user.getNoOfPoemPosted());
-                        String quoteCount = String.format(Locale.getDefault(), "Quotes (%d)", user.getNoOfQuotesPosted());
-                        String storyCount = String.format(Locale.getDefault(), "Stories (%d)", user.getNoOfStoryPosted());
-
-                        profileActPoemCountBtn.setText(poemCount);
-                        profileActQuoteCountBtn.setText(quoteCount);
-                        profileActStoryCountBtn.setText(storyCount);
+                    public void onComplete(@NonNull Task<Void> task) {
+                        followBtnProgressBar.setVisibility(View.GONE);
+                        followingUserBtn.setVisibility(View.VISIBLE);
                     }
                 });
+            }
+        });
+
+
+        followingUserBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                followingUserBtn.setVisibility(View.GONE);
+                followBtnProgressBar.setVisibility(View.VISIBLE);
+
+                batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayRemove(getIntent().getStringExtra(Users.USER_ID)));
+                batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayRemove(LOGGED_IN_UID));
+
+                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        followBtnProgressBar.setVisibility(View.GONE);
+                        followUserBtn.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        });
+
+
 
         profileActQuoteCountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +161,21 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 togglePostFragment(Posts.STORY_TYPE_POST);
+            }
+        });
+
+        profileActFollowerCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ProfileActivity.this, FollowListActivity.class));
+            }
+        });
+
+
+        profileActFollowingCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
@@ -195,5 +224,66 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, selectedFragment).commit();
+    }
+
+
+    public void getProfileUserDetails() {
+        firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot doc = task.getResult();
+
+                        Users user = new Users();
+                        user.setUserAvatar(doc.getString(Users.USERAVATAR));
+                        user.setUsername(doc.getString(Users.USERNAME));
+                        user.setNoOfStoryPosted(Integer.parseInt(doc.get(Users.NO_OF_STORY_POSTED).toString()));
+                        user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
+                        user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
+                        user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
+                        user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
+                        user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
+                        user.setPrivateProfile(doc.getBoolean(Users.IS_PRIVATE_PROFILE));
+
+                        Log.d("PROFILE_ACT_LOG", "user profile: " + new Gson().toJson(user));
+
+                        if (user.getUserAvatar() != null) {
+                            Picasso.get().load(user.getUserAvatar())
+                                    .transform(new ImageCircleTransform())
+                                    .into(profileActUserAvatarIV);
+                        }
+
+                        profileActUsernameTV.setText(user.getUsername());
+                        profileActFollowersCountTV.setText(Integer.toString(user.getFollowerUsers().size()));
+                        profileActFollowingsCountTV.setText(Integer.toString(user.getFollowingUsers().size()));
+                        profileActLikesCountTV.setText(Integer.toString(user.getFavPosts().size()));
+
+                        String poemCount = String.format(Locale.getDefault(), "Poems (%d)", user.getNoOfPoemPosted());
+                        String quoteCount = String.format(Locale.getDefault(), "Quotes (%d)", user.getNoOfQuotesPosted());
+                        String storyCount = String.format(Locale.getDefault(), "Stories (%d)", user.getNoOfStoryPosted());
+
+                        profileActPoemCountBtn.setText(poemCount);
+                        profileActQuoteCountBtn.setText(quoteCount);
+                        profileActStoryCountBtn.setText(storyCount);
+
+
+                        if (user.isPrivateProfile()) {
+                            if (globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).getFollowerUsers().contains(LOGGED_IN_UID)) {
+                                followUserBtn.setVisibility(View.GONE);
+                                followingUserBtn.setVisibility(View.VISIBLE);
+                                getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
+                            }
+                            else {
+                                postTabsWrapperLL.setVisibility(View.GONE);
+                            }
+                        }
+                        else {
+                            getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
+                        }
+
+
+                    }
+                });
     }
 }

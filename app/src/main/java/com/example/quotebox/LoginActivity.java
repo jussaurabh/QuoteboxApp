@@ -287,7 +287,8 @@ public class LoginActivity extends AppCompatActivity {
                                                         0,
                                                         new ArrayList<String>(),
                                                         new ArrayList<String>(),
-                                                        userPostColl
+                                                        userPostColl,
+                                                        false
                                                 );
 
                                                 firestore.collection(CollectionNames.USERS)

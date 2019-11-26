@@ -5,7 +5,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.example.quotebox.ui.SettingFragment;
@@ -13,6 +12,7 @@ import com.example.quotebox.ui.SettingFragment;
 public class SettingActivity extends AppCompatActivity {
 
     Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,8 @@ public class SettingActivity extends AppCompatActivity {
 
     }
 
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -41,5 +43,4 @@ public class SettingActivity extends AppCompatActivity {
         finish();
         startActivity(new Intent(SettingActivity.this, HomeActivity.class));
     }
-
 }

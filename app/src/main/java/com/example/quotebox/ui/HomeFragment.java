@@ -56,45 +56,10 @@ public class HomeFragment extends Fragment {
 
         Log.d("HOME_FRAG", "on Home fragment onCreated");
 
-        postController = new PostController();
         globalClass = (GlobalClass) getActivity().getApplicationContext();
+        postController = new PostController(globalClass);
 
-        postController.getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
-            @Override
-            public void onGetAllPost(List<Posts> postsList) {
-                if (postsList.size() > 0) {
-                    homeRecyclerView.setVisibility(View.VISIBLE);
-//                    homeFragProgressBar.setVisibility(View.GONE);
-                    homeSwipeRefresh.setRefreshing(false);
-                    homeSwipeRefresh.setVisibility(View.GONE);
-
-                    postsAdapter = new PostsAdapter(getActivity(), postsList);
-                    homeRecyclerView.setAdapter(postsAdapter);
-
-                    HashMap<String, Posts> allposts = new HashMap<>();
-
-                    for (Posts p : postsList) {
-                        allposts.put(p._getPostId(), p);
-                    }
-
-                    globalClass.setAllPosts(allposts);
-                }
-                else {
-//                    homeFragProgressBar.setVisibility(View.GONE);
-                    homeSwipeRefresh.setRefreshing(false);
-                    homeSwipeRefresh.setVisibility(View.GONE);
-                    homeFragDefaultLL.setVisibility(View.VISIBLE);
-
-                    HashMap<String, Posts> allposts = new HashMap<>();
-
-                    for (Posts p : postsList) {
-                        allposts.put(p._getPostId(), p);
-                    }
-
-                    globalClass.setAllPosts(allposts);
-                }
-            }
-        });
+        displayAllPosts();
     }
 
     @Override
@@ -103,43 +68,9 @@ public class HomeFragment extends Fragment {
 
         if (isHomeFragmentLoaded) {
             Log.d("HOME_FRAG", "on Home fragment RESUME");
-            postController = new PostController();
+            postController = new PostController(globalClass);
 
-            postController.getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
-                @Override
-                public void onGetAllPost(List<Posts> postsList) {
-                    if (postsList.size() > 0) {
-                        homeRecyclerView.setVisibility(View.VISIBLE);
-//                        homeFragProgressBar.setVisibility(View.GONE);
-                        homeSwipeRefresh.setRefreshing(false);
-                        homeSwipeRefresh.setVisibility(View.GONE);
-                        homeRecyclerView.setAdapter(postsAdapter);
-                        postsAdapter = new PostsAdapter(getActivity(), postsList);
-
-                        HashMap<String, Posts> allposts = new HashMap<>();
-
-                        for (Posts p : postsList) {
-                            allposts.put(p._getPostId(), p);
-                        }
-
-                        globalClass.setAllPosts(allposts);
-                    }
-                    else {
-//                        homeFragProgressBar.setVisibility(View.GONE);
-                        homeSwipeRefresh.setRefreshing(false);
-                        homeSwipeRefresh.setVisibility(View.GONE);
-                        homeFragDefaultLL.setVisibility(View.VISIBLE);
-
-                        HashMap<String, Posts> allposts = new HashMap<>();
-
-                        for (Posts p : postsList) {
-                            allposts.put(p._getPostId(), p);
-                        }
-
-                        globalClass.setAllPosts(allposts);
-                    }
-                }
-            });
+            displayAllPosts();
         }
     }
 
@@ -159,7 +90,53 @@ public class HomeFragment extends Fragment {
 
         homeSwipeRefresh.setRefreshing(true);
 
+        homeSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                displayAllPosts();
+                homeSwipeRefresh.setRefreshing(false);
+            }
+        });
+
         return view;
+    }
+
+
+    public void displayAllPosts() {
+        postController.getAllPosts().addOnGetAllPostCompleteListener(new PostListeners.OnGetAllPostCompleteListener() {
+            @Override
+            public void onGetAllPost(List<Posts> postsList) {
+                if (postsList.size() > 0) {
+                    homeRecyclerView.setVisibility(View.VISIBLE);
+//                        homeFragProgressBar.setVisibility(View.GONE);
+                    postsAdapter = new PostsAdapter(getActivity(), postsList);
+                    homeRecyclerView.setAdapter(postsAdapter);
+
+                    homeSwipeRefresh.setRefreshing(false);
+
+                    HashMap<String, Posts> allposts = new HashMap<>();
+
+                    for (Posts p : postsList) {
+                        allposts.put(p._getPostId(), p);
+                    }
+
+                    globalClass.setAllPosts(allposts);
+                }
+                else {
+//                        homeFragProgressBar.setVisibility(View.GONE);
+                    homeSwipeRefresh.setRefreshing(false);
+                    homeFragDefaultLL.setVisibility(View.VISIBLE);
+
+                    HashMap<String, Posts> allposts = new HashMap<>();
+
+                    for (Posts p : postsList) {
+                        allposts.put(p._getPostId(), p);
+                    }
+
+                    globalClass.setAllPosts(allposts);
+                }
+            }
+        });
     }
 
 }

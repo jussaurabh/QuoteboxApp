@@ -73,14 +73,14 @@
                         android:text="24"
                         android:textAlignment="center"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="24sp" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:text="Followers"
+                        android:text="followers"
                         android:textAlignment="center" />
                 </LinearLayout>
 
@@ -100,14 +100,14 @@
                         android:text="12"
                         android:textAlignment="center"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="24sp" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:text="Following"
+                        android:text="following"
                         android:textAlignment="center" />
                 </LinearLayout>
 
@@ -125,15 +125,14 @@
                         android:text="11"
                         android:textAlignment="center"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="24sp" />
 
                     <TextView
-                        android:id="@+id/textView9"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/nunito"
-                        android:text="Likes" />
+                        android:text="likes" />
                 </LinearLayout>
 
             </LinearLayout>

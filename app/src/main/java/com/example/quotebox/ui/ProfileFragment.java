@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.quotebox.FavoritePostActivity;
+import com.example.quotebox.FollowListActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.ImageCircleTransform;
@@ -116,6 +117,20 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), FavoritePostActivity.class));
+            }
+        });
+
+        followerCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), FollowListActivity.class));
+            }
+        });
+
+        followingCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                startActivity(new Intent(getContext(), FollowListActivity.class));
             }
         });
 

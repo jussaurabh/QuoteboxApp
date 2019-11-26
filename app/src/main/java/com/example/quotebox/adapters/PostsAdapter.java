@@ -2,6 +2,7 @@ package com.example.quotebox.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +77,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         batch = firestore.batch();
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
-        postController= new PostController();
+        postController= new PostController(globalClass);
 
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }
@@ -107,11 +108,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
 
         final String uname = holder.authorUsernameTV.getText().toString().split("@")[1];
 
-//        if (allUsersData.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
-//            Picasso.get().load(allUsersData.get(postsList.get(position).getUserId()).getUserAvatar())
-//                    .transform(new ImageCircleTransform())
-//                    .into(holder.authorAvatarIV);
-//        }
+        if (allUsersData.get(postsList.get(position).getUserId()).getUserAvatar() != null) {
+            Picasso.get().load(allUsersData.get(postsList.get(position).getUserId()).getUserAvatar())
+                    .transform(new ImageCircleTransform())
+                    .into(holder.authorAvatarIV);
+        }
 
         holder.authorUsernameTV.setOnClickListener(new View.OnClickListener() {
             @Override
