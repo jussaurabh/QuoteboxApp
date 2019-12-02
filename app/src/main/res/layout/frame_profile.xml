@@ -23,7 +23,7 @@
                 android:id="@+id/userProfileAvatarIV"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:paddingTop="40dp"
+                android:layout_marginTop="40dp"
                 android:paddingBottom="40dp"
                 android:src="@mipmap/ic_avatar_placeholder_round" />
         </LinearLayout>

@@ -1,11 +1,14 @@
 package com.example.quotebox.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -13,16 +16,21 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreference;
 
 import com.example.quotebox.R;
+import com.example.quotebox.helpers.CollectionNames;
+import com.example.quotebox.models.Users;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class SettingFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
+public class SettingFragment extends PreferenceFragmentCompat {
 
     FirebaseFirestore firestore;
     FirebaseUser firebaseUser;
 
-    SharedPreferences sharedPreferences;
+    Activity activity;
     SwitchPreference switchPreference;
 
     @Override
@@ -31,29 +39,32 @@ public class SettingFragment extends PreferenceFragmentCompat implements SharedP
 
         firestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        activity = this.getActivity();
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        switchPreference = findPreference("pref_account_privacy");
 
-        switchPreference = findPreference(getActivity().getString(R.string.pref_account_privacy));
+        switchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (switchPreference.isChecked()) {
+                    Toast.makeText(activity, "privat UNchecked", Toast.LENGTH_LONG).show();
+                    switchPreference.setChecked(false);
 
+                    firestore.collection(CollectionNames.USERS).document(firebaseUser.getUid())
+                            .update(Users.IS_PRIVATE_PROFILE, false);
+                }
+                else {
+                    Toast.makeText(activity, "privat checked", Toast.LENGTH_LONG).show();
+                    switchPreference.setChecked(true);
+
+                    firestore.collection(CollectionNames.USERS).document(firebaseUser.getUid())
+                            .update(Users.IS_PRIVATE_PROFILE, true);
+                }
+
+                return false;
+            }
+        });
 
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getActivity().getString(R.string.pref_account_privacy))) {
-            boolean isPrivate = sharedPreferences.getBoolean(key, false);
-            Log.d("SETTING_FRAG", isPrivate ? "true" : "false");
-        }
-    }
-
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        if (preference.getKey().equals(switchPreference)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        }
-
-        return false;
-    }
 }

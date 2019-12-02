@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment {
         Log.d("HOME_FRAG", "on Home fragment onCreated");
 
         globalClass = (GlobalClass) getActivity().getApplicationContext();
-        postController = new PostController(globalClass);
+        postController = new PostController(globalClass.getAllUsersData());
 
         displayAllPosts();
     }
@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
 
         if (isHomeFragmentLoaded) {
             Log.d("HOME_FRAG", "on Home fragment RESUME");
-            postController = new PostController(globalClass);
+            postController = new PostController(globalClass.getAllUsersData());
 
             displayAllPosts();
         }

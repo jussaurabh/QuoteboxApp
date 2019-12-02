@@ -21,6 +21,7 @@ public class Users {
     public static final String FOLLOWER_USERS = "followerUsers";
     public static final String FOLLOWING_USERS = "followingUsers";
     public static final String IS_PRIVATE_PROFILE = "privateProfile";
+    public static final String FOLLOW_REQUESTS = "followRequests";
 
     public static final String USER_POST_COLLECTIONS = "userPostCollections";
     public static final String DEFAULT_POST_COLLECTION = "Favorites";
@@ -42,6 +43,8 @@ public class Users {
     private List<String> followingUsers;
     private HashMap<String, List<String>> userPostCollections;
     private boolean isPrivateProfile;
+    private List<String> followRequests;
+    private String _userId;
 
     public Users() { }
 
@@ -58,7 +61,8 @@ public class Users {
                  List<String> followerUsers,
                  List<String> followingUsers,
                  HashMap<String, List<String>> userPostCollections,
-                 boolean isprivate) {
+                 boolean isprivate,
+                 List<String> followRequests) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -73,6 +77,7 @@ public class Users {
         this.followingUsers = followingUsers;
         this.userPostCollections = userPostCollections;
         this.isPrivateProfile = isprivate;
+        this.followRequests = followRequests;
     }
 
     public String getUsername() {
@@ -187,11 +192,19 @@ public class Users {
         isPrivateProfile = privateProfile;
     }
 
-//    public boolean isProfilePrivate() {
-//        return isProfilePrivate;
-//    }
-//
-//    public void setProfilePrivate(boolean profilePrivate) {
-//        isProfilePrivate = profilePrivate;
-//    }
+    public String _getUserId() {
+        return _userId;
+    }
+
+    public void _setUserId(String _userId) {
+        this._userId = _userId;
+    }
+
+    public List<String> getFollowRequests() {
+        return followRequests;
+    }
+
+    public void setFollowRequests(List<String> followRequests) {
+        this.followRequests = followRequests;
+    }
 }

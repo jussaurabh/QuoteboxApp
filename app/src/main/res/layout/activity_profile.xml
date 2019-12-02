@@ -38,7 +38,8 @@
                         android:id="@+id/profileActUserAvatarIV"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
-                        android:paddingTop="40dp"
+                        android:layout_marginTop="40dp"
+                        android:paddingTop="0dp"
                         android:paddingBottom="40dp"
                         android:src="@mipmap/ic_avatar_placeholder_round" />
                 </LinearLayout>
@@ -244,6 +245,17 @@
                 android:layout_height="match_parent">
 
             </FrameLayout>
+
+            <TextView
+                android:id="@+id/userPostDefaultTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_semibold"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="TextView"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         </LinearLayout>
     </ScrollView>

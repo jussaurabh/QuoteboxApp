@@ -46,11 +46,12 @@ public class ProfileActivity extends AppCompatActivity {
     String LOGGED_IN_UID;
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
+    Bundle extras;
 
     Toolbar toolbar;
-    TextView profileActUsernameTV, profileActFollowersCountTV, profileActFollowingsCountTV, profileActLikesCountTV;
+    TextView profileActUsernameTV, profileActFollowersCountTV, profileActFollowingsCountTV, profileActLikesCountTV, userPostDefaultTV;
     ImageView profileActUserAvatarIV;
-    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL, postTabsWrapperLL;
+    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL, postTabsWrapperLL, userFollowBtnWrapperLL;
     Button followUserBtn, followingUserBtn, profileActQuoteCountBtn, profileActPoemCountBtn, profileActStoryCountBtn;
     ProgressBar followBtnProgressBar;
 
@@ -65,8 +66,11 @@ public class ProfileActivity extends AppCompatActivity {
         preferencesConfig = new SharedPreferencesConfig(this);
         globalClass = (GlobalClass) getApplicationContext();
         globalClass.setSelectedUserPosts(getIntent().getStringExtra(Users.USER_ID));
+        extras = new Bundle();
 
+        // user who is being followed
         final DocumentReference followingDoc = firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID));
+        // user who is gonna follow
         final DocumentReference followerDoc = firestore.collection(CollectionNames.USERS).document(LOGGED_IN_UID);
 
         profileActUsernameTV = findViewById(R.id.profileActUsernameTV);
@@ -84,6 +88,8 @@ public class ProfileActivity extends AppCompatActivity {
         profileActStoryCountBtn = findViewById(R.id.profileActStoryCountBtn);
         followBtnProgressBar = findViewById(R.id.followBtnProgressBar);
         postTabsWrapperLL = findViewById(R.id.postTabsWrapperLL);
+        userPostDefaultTV = findViewById(R.id.userPostDefaultTV);
+        userFollowBtnWrapperLL = findViewById(R.id.userFollowBtnWrapperLL);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -98,6 +104,10 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+
+        if (LOGGED_IN_UID.equals(getIntent().getStringExtra(Users.USER_ID))) {
+            userFollowBtnWrapperLL.setVisibility(View.GONE);
+        }
 
         getProfileUserDetails();
 
@@ -116,6 +126,12 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         followBtnProgressBar.setVisibility(View.GONE);
                         followingUserBtn.setVisibility(View.VISIBLE);
+
+                        globalClass.getAllUsersData().get(LOGGED_IN_UID)
+                                .getFollowingUsers().add(getIntent().getStringExtra(Users.USER_ID));
+
+                        globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID))
+                                .getFollowerUsers().add(LOGGED_IN_UID);
                     }
                 });
             }
@@ -136,6 +152,12 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         followBtnProgressBar.setVisibility(View.GONE);
                         followUserBtn.setVisibility(View.VISIBLE);
+
+                        globalClass.getAllUsersData().get(LOGGED_IN_UID)
+                                .getFollowingUsers().remove(getIntent().getStringExtra(Users.USER_ID));
+
+                        globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID))
+                                .getFollowerUsers().remove(LOGGED_IN_UID);
                     }
                 });
             }
@@ -175,7 +197,19 @@ public class ProfileActivity extends AppCompatActivity {
         profileActFollowingCountWrapperLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                extras.putString(Users.USER_ID, getIntent().getStringExtra(Users.USER_ID));
+                extras.putString("follow", Users.FOLLOWING_USERS);
+                startActivity(new Intent(ProfileActivity.this, FollowListActivity.class).putExtras(extras));
+            }
+        });
 
+
+        profileActFollowerCountWrapperLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                extras.putString(Users.USER_ID, getIntent().getStringExtra(Users.USER_ID));
+                extras.putString("follow", Users.FOLLOWER_USERS);
+                startActivity(new Intent(ProfileActivity.this, FollowListActivity.class).putExtras(extras));
             }
         });
 
@@ -272,6 +306,7 @@ public class ProfileActivity extends AppCompatActivity {
                             if (globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).getFollowerUsers().contains(LOGGED_IN_UID)) {
                                 followUserBtn.setVisibility(View.GONE);
                                 followingUserBtn.setVisibility(View.VISIBLE);
+                                userPostDefaultTV.setVisibility(View.GONE);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
                             }
                             else {
@@ -279,6 +314,7 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         }
                         else {
+                            userPostDefaultTV.setVisibility(View.GONE);
                             getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
                         }
 

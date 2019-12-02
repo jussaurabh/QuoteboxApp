@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +27,8 @@ import com.example.quotebox.ui.CollectionFragment;
 import com.example.quotebox.ui.HomeFragment;
 import com.example.quotebox.ui.NotificationFragment;
 import com.example.quotebox.ui.ProfileFragment;
+import com.example.quotebox.ui.SearchFragment;
+import com.example.quotebox.ui.SettingFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -197,6 +200,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.bottom_nav_collection: {
                     selectedFragment = new CollectionFragment();
                     toolbar.setTitle("Collections");
+                    break;
+                }
+                case R.id.bottom_nav_search: {
+                    selectedFragment = new SearchFragment();
+                    toolbar.setTitle("Search");
                     break;
                 }
                 case R.id.bottom_nav_notification: {

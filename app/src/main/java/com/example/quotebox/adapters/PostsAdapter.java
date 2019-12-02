@@ -77,7 +77,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
         batch = firestore.batch();
         preferencesConfig = new SharedPreferencesConfig(this.context);
         globalClass = (GlobalClass) PostsAdapter.this.context.getApplicationContext();
-        postController= new PostController(globalClass);
+        postController= new PostController(globalClass.getAllUsersData());
 
         return new PostsViewHolder(LayoutInflater.from(this.context).inflate(R.layout.card_posts, parent,false));
     }

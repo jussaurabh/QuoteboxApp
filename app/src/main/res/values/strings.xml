@@ -20,7 +20,7 @@
     <string name="menu_settings">Settings</string>
 
     <string name="pref_account_privacy">Account Privacy</string>
-    <string name="pref_account_privacy_summary">When your account is private, only people you approve can see your posts on Quotebox. Your existing followers won\'t be affected</string>
+    <string name="pref_account_privacy_summary">When your account is private, only people you approve can see your posts on Quotebox and can follow you. Your existing followers won\'t be affected</string>
 
     <string name="pref_edit_profile">Edit Profile</string>
     <string name="pref_email">pref_email</string>

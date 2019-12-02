@@ -40,6 +40,7 @@ import java.util.Locale;
 public class ProfileFragment extends Fragment {
 
     private GlobalClass globalClass;
+    Bundle extras;
 
     private ImageView userProfileAvatarIV;
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
@@ -55,6 +56,7 @@ public class ProfileFragment extends Fragment {
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
         globalClass = (GlobalClass) getActivity().getApplicationContext();
+        extras = new Bundle();
         Users loggedInUserData = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         userProfileAvatarIV = view.findViewById(R.id.userProfileAvatarIV);
@@ -91,6 +93,13 @@ public class ProfileFragment extends Fragment {
                     .into(userProfileAvatarIV);
         }
 
+        if (loggedInUserData.getUserAboutMe() != null) {
+            if (loggedInUserData.getUserAboutMe().length() > 0) {
+                userAboutWrapperLL.setVisibility(View.VISIBLE);
+                userAboutTV.setText(loggedInUserData.getUserAboutMe());
+            }
+        }
+
 
         userQuoteCountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,14 +132,18 @@ public class ProfileFragment extends Fragment {
         followerCountWrapperLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), FollowListActivity.class));
+                extras.putString(Users.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                extras.putString("follow", Users.FOLLOWER_USERS);
+                startActivity(new Intent(getContext(), FollowListActivity.class).putExtras(extras));
             }
         });
 
         followingCountWrapperLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                startActivity(new Intent(getContext(), FollowListActivity.class));
+                extras.putString(Users.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                extras.putString("follow", Users.FOLLOWING_USERS);
+                startActivity(new Intent(getContext(), FollowListActivity.class).putExtras(extras));
             }
         });
 

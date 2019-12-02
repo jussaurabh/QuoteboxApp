@@ -123,6 +123,8 @@ public class GlobalClass extends Application {
                             user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
                             user.setUserPostCollections((HashMap<String, List<String>>) doc.get(Users.USER_POST_COLLECTIONS));
                             user.setPrivateProfile(doc.getBoolean(Users.IS_PRIVATE_PROFILE));
+                            user.setFollowRequests((List<String>) doc.get(Users.FOLLOW_REQUESTS));
+                            user._setUserId(doc.getId());
 
                             allUsers.put(doc.getId(), user);
                         }

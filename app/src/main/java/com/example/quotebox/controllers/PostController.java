@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PostController extends PostListeners {
@@ -27,7 +28,7 @@ public class PostController extends PostListeners {
     private FirebaseFirestore firestore;
     private List<Posts> allPosts;
     private Posts post;
-    GlobalClass globalClass;
+    HashMap<String, Users> allUsersData;
 
     private OnGetAllPostCompleteListener getAllPostCompleteListener;
     private OnGetPostCompleteListener getPostCompleteListener;
@@ -40,8 +41,8 @@ public class PostController extends PostListeners {
         postLikeUpdateListener = null;
     }
 
-    public PostController(GlobalClass gb) {
-        this.globalClass = gb;
+    public PostController(HashMap<String, Users> alluserdata) {
+        this.allUsersData = alluserdata;
         this.firestore = FirebaseFirestore.getInstance();
         getAllPostCompleteListener = null;
         getPostCompleteListener = null;
@@ -117,10 +118,13 @@ public class PostController extends PostListeners {
                             List<Posts> posts = new ArrayList<>();
 
                             String logged_in_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            Users logged_in_user = globalClass.getAllUsersData().get(logged_in_uid);
+                            Users logged_in_user = allUsersData.get(logged_in_uid);
 
                             for (QueryDocumentSnapshot doc : task.getResult()) {
-                                boolean isPrivate = globalClass.getAllUsersData().get(doc.getString(Users.USER_ID)).isPrivateProfile();
+                                boolean isPrivate = false;
+                                if (allUsersData.get(doc.getString(Users.USER_ID)) != null)
+                                     isPrivate = allUsersData.get(doc.getString(Users.USER_ID)).isPrivateProfile();
+
 
                                 if (logged_in_uid.equals(doc.getString(Users.USER_ID)) || !isPrivate || (isPrivate && logged_in_user.getFollowingUsers().contains(doc.getString(Users.USER_ID)))) {
                                     Posts post = new Posts();

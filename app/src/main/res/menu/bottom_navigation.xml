@@ -12,6 +12,10 @@
         android:icon="@drawable/ic_collection_border_black"
         android:title="Collections"/>
 
+    <item
+        android:id="@+id/bottom_nav_search"
+        android:icon="@drawable/ic_search_black"
+        android:title="Search"/>
 
     <item
         android:id="@+id/bottom_nav_notification"
@@ -22,8 +26,5 @@
         android:id="@+id/bottom_nav_account"
         android:icon="@drawable/ic_account_border_circle_black"
         android:title="Profile"/>
-
-
-
 
 </menu>
