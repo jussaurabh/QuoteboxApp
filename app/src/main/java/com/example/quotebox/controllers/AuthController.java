@@ -49,15 +49,16 @@ public class AuthController {
                                     null,
                                     null,
                                     null,
-                                    new ArrayList<String>(),
+                                    new ArrayList<String>(),    // favPosts
                                     0,
                                     0,
                                     0,
-                                    new ArrayList<String>(),
-                                    new ArrayList<String>(),
+                                    new ArrayList<String>(),    // followerUsers
+                                    new ArrayList<String>(),    // followingUsers
                                     userPostColl,
                                     false,
-                                    new ArrayList<String>()
+                                    new ArrayList<String>(),    // followRequestSent
+                                    new ArrayList<String>()     // followRequestReceived
                             );
 
                             firestore.collection(CollectionNames.USERS)

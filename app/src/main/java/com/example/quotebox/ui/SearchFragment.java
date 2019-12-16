@@ -49,10 +49,6 @@ public class SearchFragment extends Fragment {
         searchRecyclerView.setHasFixedSize(true);
         searchRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-//        for (Users u : globalClass.getAllUsersData().values()) {
-//            allUsersList.addAll(u);
-//        }
-
         searchListAdapter = new SearchListAdapter(getContext(), allUsersList);
         searchRecyclerView.setAdapter(searchListAdapter);
 

@@ -289,6 +289,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         new ArrayList<String>(),
                                                         userPostColl,
                                                         false,
+                                                        new ArrayList<String>(),
                                                         new ArrayList<String>()
                                                 );
 

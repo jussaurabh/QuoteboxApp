@@ -22,8 +22,11 @@ import com.example.quotebox.controllers.PostController;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.interfaces.PostListeners;
 import com.example.quotebox.models.Posts;
+import com.example.quotebox.models.Users;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -108,17 +111,26 @@ public class HomeFragment extends Fragment {
             public void onGetAllPost(List<Posts> postsList) {
                 if (postsList.size() > 0) {
                     homeRecyclerView.setVisibility(View.VISIBLE);
-//                        homeFragProgressBar.setVisibility(View.GONE);
-                    postsAdapter = new PostsAdapter(getActivity(), postsList);
-                    homeRecyclerView.setAdapter(postsAdapter);
 
-                    homeSwipeRefresh.setRefreshing(false);
-
+                    List<Posts> pls = new ArrayList<>();
                     HashMap<String, Posts> allposts = new HashMap<>();
+                    HashMap<String, Users> allusers = globalClass.getAllUsersData();
 
                     for (Posts p : postsList) {
                         allposts.put(p._getPostId(), p);
+                        if (p.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                            pls.add(p);
+                        } else {
+                            if (!allusers.get(p.getUserId()).isPrivateProfile() || allusers.get(FirebaseAuth.getInstance().getCurrentUser().getUid()).getFollowingUsers().contains(p.getUserId())) {
+                                pls.add(p);
+                            }
+                        }
                     }
+
+                    postsAdapter = new PostsAdapter(getActivity(), pls);
+                    homeRecyclerView.setAdapter(postsAdapter);
+
+                    homeSwipeRefresh.setRefreshing(false);
 
                     globalClass.setAllPosts(allposts);
                 }

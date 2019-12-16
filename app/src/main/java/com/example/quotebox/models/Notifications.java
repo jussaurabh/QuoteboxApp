@@ -2,8 +2,10 @@ package com.example.quotebox.models;
 
 public class Notifications {
 
-    public static final String FOLLOW_TYPE_NOTIFY = "follow";
+    // types of notifications
+    public static final String FOLLOWING_TYPE_NOTIFY = "following";
     public static final String POST_UPDATE_TYPE_NOTIFY = "postUpdate";
+    public static final String REPORT_TYPE_NOTIFY = "report";
 
     public static final String NOTIFY_TYPE = "notifyType";
     public static final String NOTIFY_ID = "notifyId";
@@ -32,11 +34,11 @@ public class Notifications {
         this.notifyId = notifyId;
     }
 
-    public String _getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void _setUserId(String userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

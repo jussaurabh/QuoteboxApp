@@ -58,23 +58,32 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/listFollowBtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:background="@drawable/dark_solid_border"
             android:fontFamily="@font/nunito_bold"
             android:text="Follow"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/colorPrimary" />
 
+        <TextView
+            android:id="@+id/listFollowRequestTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Request Sent"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/listFollowingBtn"
             style="@style/darkButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:fontFamily="@font/nunito_bold"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"

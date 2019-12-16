@@ -14,7 +14,6 @@ import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -123,7 +122,8 @@ public class GlobalClass extends Application {
                             user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
                             user.setUserPostCollections((HashMap<String, List<String>>) doc.get(Users.USER_POST_COLLECTIONS));
                             user.setPrivateProfile(doc.getBoolean(Users.IS_PRIVATE_PROFILE));
-                            user.setFollowRequests((List<String>) doc.get(Users.FOLLOW_REQUESTS));
+                            user.setFollowRequestSent((List<String>) doc.get(Users.FOLLOW_REQUEST_SENT));
+                            user.setFollowRequestReceived((List<String>) doc.get(Users.FOLLOW_REQUEST_RECEIVED));
                             user._setUserId(doc.getId());
 
                             allUsers.put(doc.getId(), user);

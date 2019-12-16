@@ -16,6 +16,7 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreference;
 
 import com.example.quotebox.R;
+import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +30,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
 
     FirebaseFirestore firestore;
     FirebaseUser firebaseUser;
+    GlobalClass globalClass;
 
     Activity activity;
     SwitchPreference switchPreference;
@@ -40,8 +42,15 @@ public class SettingFragment extends PreferenceFragmentCompat {
         firestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         activity = this.getActivity();
+        globalClass = (GlobalClass) activity.getApplicationContext();
 
         switchPreference = findPreference("pref_account_privacy");
+
+        if (globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid()).isPrivateProfile()) {
+            switchPreference.setChecked(true);
+        } else {
+            switchPreference.setChecked(false);
+        }
 
         switchPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override

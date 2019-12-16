@@ -3,7 +3,6 @@ package com.example.quotebox.models;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Users {
 
@@ -21,7 +20,8 @@ public class Users {
     public static final String FOLLOWER_USERS = "followerUsers";
     public static final String FOLLOWING_USERS = "followingUsers";
     public static final String IS_PRIVATE_PROFILE = "privateProfile";
-    public static final String FOLLOW_REQUESTS = "followRequests";
+    public static final String FOLLOW_REQUEST_SENT = "followRequestSent";
+    public static final String FOLLOW_REQUEST_RECEIVED = "followRequestReceived";
 
     public static final String USER_POST_COLLECTIONS = "userPostCollections";
     public static final String DEFAULT_POST_COLLECTION = "Favorites";
@@ -43,7 +43,8 @@ public class Users {
     private List<String> followingUsers;
     private HashMap<String, List<String>> userPostCollections;
     private boolean isPrivateProfile;
-    private List<String> followRequests;
+    private List<String> followRequestSent;
+    private List<String> followRequestReceived;
     private String _userId;
 
     public Users() { }
@@ -62,7 +63,8 @@ public class Users {
                  List<String> followingUsers,
                  HashMap<String, List<String>> userPostCollections,
                  boolean isprivate,
-                 List<String> followRequests) {
+                 List<String> followRequestSent,
+                 List<String> followRequestReceived) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -77,7 +79,8 @@ public class Users {
         this.followingUsers = followingUsers;
         this.userPostCollections = userPostCollections;
         this.isPrivateProfile = isprivate;
-        this.followRequests = followRequests;
+        this.followRequestSent = followRequestSent;
+        this.followRequestReceived = followRequestReceived;
     }
 
     public String getUsername() {
@@ -200,11 +203,19 @@ public class Users {
         this._userId = _userId;
     }
 
-    public List<String> getFollowRequests() {
-        return followRequests;
+    public List<String> getFollowRequestSent() {
+        return followRequestSent;
     }
 
-    public void setFollowRequests(List<String> followRequests) {
-        this.followRequests = followRequests;
+    public void setFollowRequestSent(List<String> followRequestSent) {
+        this.followRequestSent = followRequestSent;
+    }
+
+    public List<String> getFollowRequestReceived() {
+        return followRequestReceived;
+    }
+
+    public void setFollowRequestReceived(List<String> followRequestReceived) {
+        this.followRequestReceived = followRequestReceived;
     }
 }

@@ -11,12 +11,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.models.Users;
+import com.example.quotebox.ui.ProfileFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -53,7 +56,13 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
         holder.searchUsernameTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.startActivity(new Intent(context, ProfileActivity.class).putExtra(Users.USER_ID, usersList.get(position)._getUserId()));
+                if (usersList.get(position)._getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    ((FragmentActivity)context).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_container, new ProfileFragment()).commit();
+                } else {
+                    context.startActivity(new Intent(context, ProfileActivity.class)
+                            .putExtra(Users.USER_ID, usersList.get(position)._getUserId()));
+                }
             }
         });
     }

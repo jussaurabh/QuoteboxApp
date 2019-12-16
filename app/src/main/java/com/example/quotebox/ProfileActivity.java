@@ -27,7 +27,6 @@ import com.example.quotebox.ui.ProfileStoryFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -49,9 +48,9 @@ public class ProfileActivity extends AppCompatActivity {
     Bundle extras;
 
     Toolbar toolbar;
-    TextView profileActUsernameTV, profileActFollowersCountTV, profileActFollowingsCountTV, profileActLikesCountTV, userPostDefaultTV;
+    TextView profileActUsernameTV, profileActFollowersCountTV, profileActFollowingsCountTV, profileActLikesCountTV, followRequestSentTV;
     ImageView profileActUserAvatarIV;
-    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL, postTabsWrapperLL, userFollowBtnWrapperLL;
+    LinearLayout profileActFollowerCountWrapperLL, profileActFollowingCountWrapperLL, profileActLikeCountWrapperLL, postTabsWrapperLL, userFollowBtnWrapperLL, userPrivateProfileWrapperLL;
     Button followUserBtn, followingUserBtn, profileActQuoteCountBtn, profileActPoemCountBtn, profileActStoryCountBtn;
     ProgressBar followBtnProgressBar;
 
@@ -60,39 +59,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        firestore = FirebaseFirestore.getInstance();
-        LOGGED_IN_UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        batch = firestore.batch();
-        preferencesConfig = new SharedPreferencesConfig(this);
-        globalClass = (GlobalClass) getApplicationContext();
-        globalClass.setSelectedUserPosts(getIntent().getStringExtra(Users.USER_ID));
-        extras = new Bundle();
+        init();
+        getProfileUserDetails();
 
-        // user who is being followed
-        final DocumentReference followingDoc = firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID));
-        // user who is gonna follow
-        final DocumentReference followerDoc = firestore.collection(CollectionNames.USERS).document(LOGGED_IN_UID);
-
-        profileActUsernameTV = findViewById(R.id.profileActUsernameTV);
-        profileActFollowersCountTV = findViewById(R.id.profileActUserFollowersCountTV);
-        profileActFollowingsCountTV = findViewById(R.id.profileActUserFollowingsCountTV);
-        profileActLikesCountTV = findViewById(R.id.profileActLikesCountTV);
-        profileActUserAvatarIV = findViewById(R.id.profileActUserAvatarIV);
-        profileActFollowerCountWrapperLL = findViewById(R.id.profileActFollowerCountWrapperLL);
-        profileActFollowingCountWrapperLL = findViewById(R.id.profileActFollowingCountWrapperLL);
-        profileActLikeCountWrapperLL = findViewById(R.id.profileActPostLikeCountWrapperLL);
-        followUserBtn = findViewById(R.id.followUserBtn);
-        followingUserBtn = findViewById(R.id.followingUserBtn);
-        profileActQuoteCountBtn = findViewById(R.id.profileActQuoteCountBtn);
-        profileActPoemCountBtn = findViewById(R.id.profileActPoemCountBtn);
-        profileActStoryCountBtn = findViewById(R.id.profileActStoryCountBtn);
-        followBtnProgressBar = findViewById(R.id.followBtnProgressBar);
-        postTabsWrapperLL = findViewById(R.id.postTabsWrapperLL);
-        userPostDefaultTV = findViewById(R.id.userPostDefaultTV);
-        userFollowBtnWrapperLL = findViewById(R.id.userFollowBtnWrapperLL);
-
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         toolbar.setTitle(globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).getUsername());
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
 
@@ -104,13 +73,26 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        // user who is being followed
+        final DocumentReference followingDoc = firestore.collection(CollectionNames.USERS).document(getIntent().getStringExtra(Users.USER_ID));
+        // user who is gonna follow
+        final DocumentReference followerDoc = firestore.collection(CollectionNames.USERS).document(LOGGED_IN_UID);
+
+        // -- if user has already sent follow request
+        if (globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).getFollowRequestReceived().contains(LOGGED_IN_UID)) {
+            followUserBtn.setVisibility(View.GONE);
+            followRequestSentTV.setVisibility(View.VISIBLE);
+        }
 
         if (LOGGED_IN_UID.equals(getIntent().getStringExtra(Users.USER_ID))) {
             userFollowBtnWrapperLL.setVisibility(View.GONE);
         }
 
-        getProfileUserDetails();
-
+        // -- if user is already following this user
+        if (globalClass.getAllUsersData().get(LOGGED_IN_UID).getFollowingUsers().contains(getIntent().getStringExtra(Users.USER_ID))) {
+            followUserBtn.setVisibility(View.GONE);
+            followingUserBtn.setVisibility(View.VISIBLE);
+        }
 
         followUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,22 +100,43 @@ public class ProfileActivity extends AppCompatActivity {
                 followUserBtn.setVisibility(View.GONE);
                 followBtnProgressBar.setVisibility(View.VISIBLE);
 
-                batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayUnion(getIntent().getStringExtra(Users.USER_ID)));
-                batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayUnion(LOGGED_IN_UID));
+                // if the account is private
+                if (globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).isPrivateProfile()) {
+                    batch.update(followerDoc, Users.FOLLOW_REQUEST_SENT, FieldValue.arrayUnion(getIntent().getStringExtra(Users.USER_ID)));
+                    batch.update(followingDoc, Users.FOLLOW_REQUEST_RECEIVED, FieldValue.arrayUnion(LOGGED_IN_UID));
 
-                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        followBtnProgressBar.setVisibility(View.GONE);
-                        followingUserBtn.setVisibility(View.VISIBLE);
+                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            followBtnProgressBar.setVisibility(View.GONE);
+                            followRequestSentTV.setVisibility(View.VISIBLE);
 
-                        globalClass.getAllUsersData().get(LOGGED_IN_UID)
-                                .getFollowingUsers().add(getIntent().getStringExtra(Users.USER_ID));
+                            globalClass.getAllUsersData().get(LOGGED_IN_UID)
+                                    .getFollowRequestSent().add(getIntent().getStringExtra(Users.USER_ID));
 
-                        globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID))
-                                .getFollowerUsers().add(LOGGED_IN_UID);
-                    }
-                });
+                            globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID))
+                                    .getFollowRequestReceived().add(LOGGED_IN_UID);
+                        }
+                    });
+                }
+                else {
+                    batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayUnion(getIntent().getStringExtra(Users.USER_ID)));
+                    batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayUnion(LOGGED_IN_UID));
+
+                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            followBtnProgressBar.setVisibility(View.GONE);
+                            followingUserBtn.setVisibility(View.VISIBLE);
+
+                            globalClass.getAllUsersData().get(LOGGED_IN_UID)
+                                    .getFollowingUsers().add(getIntent().getStringExtra(Users.USER_ID));
+
+                            globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID))
+                                    .getFollowerUsers().add(LOGGED_IN_UID);
+                        }
+                    });
+                }
             }
         });
 
@@ -267,18 +270,19 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot doc = task.getResult();
+                        Users user = task.getResult().toObject(Users.class);
+//                        DocumentSnapshot doc = task.getResult();
 
-                        Users user = new Users();
-                        user.setUserAvatar(doc.getString(Users.USERAVATAR));
-                        user.setUsername(doc.getString(Users.USERNAME));
-                        user.setNoOfStoryPosted(Integer.parseInt(doc.get(Users.NO_OF_STORY_POSTED).toString()));
-                        user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
-                        user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
-                        user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
-                        user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
-                        user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
-                        user.setPrivateProfile(doc.getBoolean(Users.IS_PRIVATE_PROFILE));
+//                        Users user = new Users();
+//                        user.setUserAvatar(doc.getString(Users.USERAVATAR));
+//                        user.setUsername(doc.getString(Users.USERNAME));
+//                        user.setNoOfStoryPosted(Integer.parseInt(doc.get(Users.NO_OF_STORY_POSTED).toString()));
+//                        user.setNoOfPoemPosted(Integer.parseInt(doc.get(Users.NO_OF_POEM_POSTED).toString()));
+//                        user.setNoOfQuotesPosted(Integer.parseInt(doc.get(Users.NO_OF_QUOTES_POSTED).toString()));
+//                        user.setFavPosts((List<String>) doc.get(Users.FAV_POSTS));
+//                        user.setFollowerUsers((List<String>) doc.get(Users.FOLLOWER_USERS));
+//                        user.setFollowingUsers((List<String>) doc.get(Users.FOLLOWING_USERS));
+//                        user.setPrivateProfile(doc.getBoolean(Users.IS_PRIVATE_PROFILE));
 
                         Log.d("PROFILE_ACT_LOG", "user profile: " + new Gson().toJson(user));
 
@@ -303,10 +307,10 @@ public class ProfileActivity extends AppCompatActivity {
 
 
                         if (user.isPrivateProfile()) {
-                            if (globalClass.getAllUsersData().get(getIntent().getStringExtra(Users.USER_ID)).getFollowerUsers().contains(LOGGED_IN_UID)) {
+                            if (globalClass.getAllUsersData().get(LOGGED_IN_UID).getFollowingUsers().contains(getIntent().getStringExtra(Users.USER_ID))) {
                                 followUserBtn.setVisibility(View.GONE);
                                 followingUserBtn.setVisibility(View.VISIBLE);
-                                userPostDefaultTV.setVisibility(View.GONE);
+                                userPrivateProfileWrapperLL.setVisibility(View.GONE);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
                             }
                             else {
@@ -314,12 +318,45 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         }
                         else {
-                            userPostDefaultTV.setVisibility(View.GONE);
+                            userPrivateProfileWrapperLL.setVisibility(View.GONE);
                             getSupportFragmentManager().beginTransaction().replace(R.id.profileActivityFL, new ProfileQuoteFragment()).commit();
                         }
 
 
                     }
                 });
+    }
+
+
+    public void init() {
+        firestore = FirebaseFirestore.getInstance();
+        LOGGED_IN_UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        batch = firestore.batch();
+        preferencesConfig = new SharedPreferencesConfig(this);
+        globalClass = (GlobalClass) getApplicationContext();
+        globalClass.setSelectedUserPosts(getIntent().getStringExtra(Users.USER_ID));
+        extras = new Bundle();
+
+        profileActUsernameTV = findViewById(R.id.profileActUsernameTV);
+        profileActFollowersCountTV = findViewById(R.id.profileActUserFollowersCountTV);
+        profileActFollowingsCountTV = findViewById(R.id.profileActUserFollowingsCountTV);
+        profileActLikesCountTV = findViewById(R.id.profileActLikesCountTV);
+        profileActUserAvatarIV = findViewById(R.id.profileActUserAvatarIV);
+        profileActFollowerCountWrapperLL = findViewById(R.id.profileActFollowerCountWrapperLL);
+        profileActFollowingCountWrapperLL = findViewById(R.id.profileActFollowingCountWrapperLL);
+        profileActLikeCountWrapperLL = findViewById(R.id.profileActPostLikeCountWrapperLL);
+        followUserBtn = findViewById(R.id.followUserBtn);
+        followingUserBtn = findViewById(R.id.followingUserBtn);
+        profileActQuoteCountBtn = findViewById(R.id.profileActQuoteCountBtn);
+        profileActPoemCountBtn = findViewById(R.id.profileActPoemCountBtn);
+        profileActStoryCountBtn = findViewById(R.id.profileActStoryCountBtn);
+        followBtnProgressBar = findViewById(R.id.followBtnProgressBar);
+        postTabsWrapperLL = findViewById(R.id.postTabsWrapperLL);
+        userFollowBtnWrapperLL = findViewById(R.id.userFollowBtnWrapperLL);
+        userPrivateProfileWrapperLL = findViewById(R.id.userPrivateProfileWrapperLL);
+        followRequestSentTV = findViewById(R.id.followRequestSentTV);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 }

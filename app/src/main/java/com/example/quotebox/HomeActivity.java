@@ -244,6 +244,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                     .into(nav_header_avatar);
                         }
 
+                        if (user.getUserAvatar() != null) {
+                            Picasso.get().load(user.getUserAvatar())
+                                    .transform(new ImageCircleTransform())
+                                    .into(nav_header_avatar);
+                        }
+
                         globalClass.setLoggedInUserData(user);
                     }
                 });

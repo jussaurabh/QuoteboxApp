@@ -1,14 +1,22 @@
 package com.example.quotebox.ui;
 
+import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,12 +32,19 @@ import com.example.quotebox.FavoritePostActivity;
 import com.example.quotebox.FollowListActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.globals.GlobalClass;
+import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -39,8 +54,15 @@ import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
+    static final int PICK_IMAGE_REQUEST = 1;
+
+    FirebaseFirestore firestore;
+    FirebaseStorage firebaseStorage;
+    StorageReference storageReference;
     private GlobalClass globalClass;
     Bundle extras;
+    Uri imgUri;
+    Users loggedInUserData;
 
     private ImageView userProfileAvatarIV;
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
@@ -53,11 +75,8 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_profile, container, false);
 
-        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
 
-        globalClass = (GlobalClass) getActivity().getApplicationContext();
-        extras = new Bundle();
-        Users loggedInUserData = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        loggedInUserData = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         userProfileAvatarIV = view.findViewById(R.id.userProfileAvatarIV);
         userProfileAuthornameTV = view.findViewById(R.id.userProfileAuthornameTV);
@@ -150,6 +169,128 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.profile_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST &&
+                data != null &&
+                data.getData() != null) {
+            imgUri = data.getData();
+
+            final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
+
+            fileRef.putFile(imgUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) throw task.getException();
+                    return fileRef.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        final String newUserAvatar = task.getResult().toString();
+                        firestore.collection(CollectionNames.USERS).document(loggedInUserData._getUserId())
+                                .update(Users.USERAVATAR, newUserAvatar)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Picasso.get().load(imgUri).transform(new ImageCircleTransform())
+                                                    .into(userProfileAvatarIV);
+                                            globalClass.getAllUsersData().get(loggedInUserData._getUserId())
+                                                    .setUserAvatar(newUserAvatar);
+                                        }
+                                    }
+                                });
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.changeAvatarMenu: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.change_avatar_dialog_layout, null);
+
+                Button selectImgBtn, removeImgBtn;
+                selectImgBtn = v.findViewById(R.id.selectProfileImgBtn);
+                removeImgBtn = v.findViewById(R.id.removeProfileImgBtn);
+
+                builder.setView(v);
+                final AlertDialog dialog = builder.create();
+                builder.show();
+
+                removeImgBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        storageReference.child(loggedInUserData.getUserAvatar()).delete()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            firestore.collection(CollectionNames.USERS).document(loggedInUserData._getUserId())
+                                                    .update(Users.USERAVATAR, null)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            dialog.dismiss();
+                                                            imgUri = null;
+                                                            Picasso.get().load(imgUri).transform(new ImageCircleTransform()).into(userProfileAvatarIV);
+                                                        }
+                                                    });
+                                        } else {
+                                            Toast.makeText(
+                                                    getContext(),
+                                                    "ERRRO on deletin profile image",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                });
+
+
+                    }
+                });
+
+                selectImgBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.cancel();
+                        openFileChooser();
+                    }
+                });
+
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    public String getFileExtension(Uri uri) {
+        ContentResolver cr = getContext().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cr.getType(uri));
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
 
     public void togglePostFragment(String postType) {
         Fragment selectedFragment = null;
@@ -196,4 +337,17 @@ public class ProfileFragment extends Fragment {
         getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, selectedFragment).commit();
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        getChildFragmentManager().beginTransaction().replace(R.id.profilePostFLContainer, new ProfileQuoteFragment()).commit();
+
+        firestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageReference = firebaseStorage.getReference("userProfileImages");
+        globalClass = (GlobalClass) getActivity().getApplicationContext();
+        extras = new Bundle();
+    }
 }

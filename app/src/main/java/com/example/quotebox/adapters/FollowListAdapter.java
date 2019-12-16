@@ -92,32 +92,53 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
         holder.listFollowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.listFollowBtn.setVisibility(View.VISIBLE);
-                holder.followListFollowBtnProgressBar.setVisibility(View.GONE);
+                holder.listFollowBtn.setVisibility(View.GONE);
+                holder.followListFollowBtnProgressBar.setVisibility(View.VISIBLE);
 
-                batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayUnion(followUserList.get(position)._getUserId()));
-                batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayUnion(LOGGED_IN_UID));
+                // if the account is private
+                if (globalClass.getAllUsersData().get(followUserList.get(position)._getUserId()).isPrivateProfile()) {
+                    batch.update(followerDoc, Users.FOLLOW_REQUEST_SENT, FieldValue.arrayUnion(followUserList.get(position)._getUserId()));
+                    batch.update(followingDoc, Users.FOLLOW_REQUEST_RECEIVED, FieldValue.arrayUnion(LOGGED_IN_UID));
 
-                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        holder.followListFollowBtnProgressBar.setVisibility(View.GONE);
-                        holder.listFollowingBtn.setVisibility(View.VISIBLE);
+                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            holder.followListFollowBtnProgressBar.setVisibility(View.GONE);
+                            holder.listFollowRequestTV.setVisibility(View.VISIBLE);
 
-                        globalClass.getAllUsersData().get(LOGGED_IN_UID).getFollowingUsers()
-                                .add(followUserList.get(position)._getUserId());
+                            globalClass.getAllUsersData().get(LOGGED_IN_UID)
+                                    .getFollowRequestSent().add(followUserList.get(position)._getUserId());
 
-                        globalClass.getAllUsersData().get(followUserList.get(position)._getUserId())
-                                .getFollowerUsers().add(LOGGED_IN_UID);
-                    }
-                });
+                            globalClass.getAllUsersData().get(followUserList.get(position)._getUserId())
+                                    .getFollowRequestReceived().add(LOGGED_IN_UID);
+                        }
+                    });
+                }
+                else {
+                    batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayUnion(followUserList.get(position)._getUserId()));
+                    batch.update(followingDoc, Users.FOLLOWER_USERS, FieldValue.arrayUnion(LOGGED_IN_UID));
+
+                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            holder.followListFollowBtnProgressBar.setVisibility(View.GONE);
+                            holder.listFollowingBtn.setVisibility(View.VISIBLE);
+
+                            globalClass.getAllUsersData().get(LOGGED_IN_UID).getFollowingUsers()
+                                    .add(followUserList.get(position)._getUserId());
+
+                            globalClass.getAllUsersData().get(followUserList.get(position)._getUserId())
+                                    .getFollowerUsers().add(LOGGED_IN_UID);
+                        }
+                    });
+                }
             }
         });
 
         holder.listFollowingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.listFollowingBtn.setVisibility(View.VISIBLE);
+                holder.listFollowingBtn.setVisibility(View.GONE);
                 holder.followListFollowBtnProgressBar.setVisibility(View.GONE);
 
                 batch.update(followerDoc, Users.FOLLOWING_USERS, FieldValue.arrayRemove(followUserList.get(position)._getUserId()));
@@ -148,7 +169,7 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
     class FollowListViewHolder extends RecyclerView.ViewHolder {
 
         ImageView avatarImageView;
-        TextView followUsernameTV, followAuthornameTV;
+        TextView followUsernameTV, followAuthornameTV, listFollowRequestTV;
         Button listFollowBtn, listFollowingBtn;
         ProgressBar followListFollowBtnProgressBar;
 
@@ -160,6 +181,7 @@ public class FollowListAdapter extends RecyclerView.Adapter<FollowListAdapter.Fo
             followAuthornameTV = iv.findViewById(R.id.followAuthornameTV);
             listFollowBtn = iv.findViewById(R.id.listFollowBtn);
             listFollowingBtn = iv.findViewById(R.id.listFollowingBtn);
+            listFollowRequestTV = iv.findViewById(R.id.listFollowRequestTV);
             followListFollowBtnProgressBar = iv.findViewById(R.id.followListFollowBtnProgressBar);
         }
     }
