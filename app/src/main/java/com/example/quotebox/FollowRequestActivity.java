@@ -13,9 +13,11 @@ import android.view.View;
 import com.example.quotebox.adapters.FollowRequestsAdapter;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
+import com.example.quotebox.models.Notifications;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -132,6 +134,18 @@ public class FollowRequestActivity extends AppCompatActivity {
                 followRequestsAdapter.notifyItemRemoved(position);
             }
         });
+
+        Notifications notifyData = new Notifications(
+                id,
+                Timestamp.now(),
+                globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid()).getUsername() + " accepted your request",
+                Notifications.FOLLOWING_TYPE_NOTIFY,
+                FirebaseAuth.getInstance().getCurrentUser().getUid()
+        );
+
+        firestore.collection(CollectionNames.NOTIFICATIONS).document(Timestamp.now().toString())
+                .set(notifyData);
+
     }
 
 }

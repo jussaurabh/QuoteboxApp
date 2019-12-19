@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.models.Notifications;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.google.android.gms.tasks.Continuation;
@@ -56,6 +57,7 @@ public class PostQuoteActivity extends AppCompatActivity {
     SharedPreferencesConfig preferencesConfig;
     GlobalClass globalClass;
     Users loggedInUserData;
+    WriteBatch batch;
 
 //    private static final String LOGGED_IN_USER_ID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -105,6 +107,7 @@ public class PostQuoteActivity extends AppCompatActivity {
         preferencesConfig = new SharedPreferencesConfig(this);
         globalClass = (GlobalClass) getApplicationContext();
         loggedInUserData = globalClass.getLoggedInUserData();
+        batch = firestore.batch();
 
         postDialog = new Dialog(this);
 
@@ -240,7 +243,7 @@ public class PostQuoteActivity extends AppCompatActivity {
     }
 
 
-    public void insertPostToDatabase(Posts post, final String uid) {
+    public void insertPostToDatabase(final Posts post, final String uid) {
         post.setPostTitle(postTitleEditText.getText().toString().trim());
         post.setPost(postEditText.getText().toString().trim());
         post.setPostType(getIntent().getStringExtra(Posts.POST_TYPE));
@@ -288,8 +291,33 @@ public class PostQuoteActivity extends AppCompatActivity {
                                 }
                             }
 
-                            finish();
-                            startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
+                            if (globalClass.getAllUsersData().get(post.getUserId()).getFollowerUsers().size() > 0) {
+                                for (String id : globalClass.getAllUsersData().get(post.getUserId()).getFollowerUsers()) {
+                                    DocumentReference notifyDoc = firestore.collection(CollectionNames.NOTIFICATIONS).document(Timestamp.now().toString());
+
+                                    Notifications notify = new Notifications(
+                                            id,
+                                            Timestamp.now(),
+                                            post.getPostUser() + " posted new " + post.getPostType(),
+                                            Notifications.POST_UPDATE_TYPE_NOTIFY,
+                                            FirebaseAuth.getInstance().getCurrentUser().getUid()
+                                    );
+
+                                    batch.set(notifyDoc, notify);
+                                }
+                                batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            finish();
+                                            startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
+                                        }
+                                    }
+                                });
+                            } else {
+                                finish();
+                                startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
+                            }
                         }
                         else {
                             Log.d("POST_LOG ", task.getException().toString());

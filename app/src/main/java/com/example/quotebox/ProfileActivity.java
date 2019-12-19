@@ -19,6 +19,7 @@ import com.example.quotebox.globals.GlobalClass;
 import com.example.quotebox.helpers.CollectionNames;
 import com.example.quotebox.helpers.ImageCircleTransform;
 import com.example.quotebox.helpers.SharedPreferencesConfig;
+import com.example.quotebox.models.Notifications;
 import com.example.quotebox.models.Posts;
 import com.example.quotebox.models.Users;
 import com.example.quotebox.ui.ProfilePoemFragment;
@@ -26,6 +27,7 @@ import com.example.quotebox.ui.ProfileQuoteFragment;
 import com.example.quotebox.ui.ProfileStoryFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -136,6 +138,17 @@ public class ProfileActivity extends AppCompatActivity {
                                     .getFollowerUsers().add(LOGGED_IN_UID);
                         }
                     });
+
+                    Notifications notifyData = new Notifications(
+                            getIntent().getStringExtra(Users.USER_ID),
+                            Timestamp.now(),
+                            globalClass.getAllUsersData().get(LOGGED_IN_UID).getUsername() + " started following you",
+                            Notifications.FOLLOWING_TYPE_NOTIFY,
+                            LOGGED_IN_UID
+                    );
+
+                    firestore.collection(CollectionNames.NOTIFICATIONS).document(Timestamp.now().toString())
+                            .set(notifyData);
                 }
             }
         });

@@ -41,7 +41,7 @@ public class FollowRequestsAdapter extends RecyclerView.Adapter<FollowRequestsAd
     @Override
     public void onBindViewHolder(@NonNull FollowRequestViewHolder holder, final int position) {
         holder.notifyUsernameTV.setText(usersList.get(position).getUsername());
-        holder.notifyContentTV.setText(usersList.get(position).getUsername());
+        holder.notifyContentTV.setText("@" + usersList.get(position).getUsername());
 
         if (usersList.get(position).getUserAvatar() != null) {
             Picasso.get().load(usersList.get(position).getUserAvatar()).transform(new ImageCircleTransform())
