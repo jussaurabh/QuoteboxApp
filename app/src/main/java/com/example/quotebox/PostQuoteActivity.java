@@ -37,6 +37,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -121,14 +122,24 @@ public class PostQuoteActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Write your " + POSTTYPE);
+
+        if (getIntent().getStringExtra("postAction") != null) {
+            toolbar.setTitle("Edit your " + POSTTYPE);
+            postSubmitBtn.setText("Edit your " + POSTTYPE);
+            postEditText.setHint("Edit your " + POSTTYPE);
+        }
+        else {
+            toolbar.setTitle("Write your " + POSTTYPE);
+            postSubmitBtn.setText("Write your " + POSTTYPE);
+            postEditText.setHint("Write your " + POSTTYPE);
+        }
+
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white);
         
         // -- setting default text for Quote Post, Story Post and Poem Post
         postAddImageBtnTag.setText("Add " + POSTTYPE + " Image");
         postTitleEditText.setHint(POSTTYPE + " Title");
-        postEditText.setHint("Write your " + POSTTYPE);
-        postSubmitBtn.setText("Post your " + POSTTYPE);
+
         
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -164,6 +175,17 @@ public class PostQuoteActivity extends AppCompatActivity {
                 storePostImageToFirestorage();
             }
         });
+
+        if (getIntent().getStringExtra("postAction") != null && getIntent().getStringExtra("postAction").equals("edit")) {
+            postTitleEditText.setText(getIntent().getStringExtra(Posts.POST_TITLE));
+            postEditText.setText(getIntent().getStringExtra(Posts.POST));
+
+            if (getIntent().getStringExtra(Posts.POST_IMAGE) != null) {
+                postAddBtnLL.setVisibility(View.GONE);
+                postImageWrapperRL.setVisibility(View.VISIBLE);
+                Picasso.get().load(getIntent().getStringExtra(Posts.POST_IMAGE)).into(postImageView);
+            }
+        }
     }
 
     public String getFileExtension(Uri uri) {
@@ -182,17 +204,7 @@ public class PostQuoteActivity extends AppCompatActivity {
 
     public void storePostImageToFirestorage() {
 
-        // returns all users credentials
-        final String LOGGED_IN_USER_ID = firebaseUser.getUid();
-
         final Posts post = new Posts();
-        post.setPostTitle(postTitleEditText.getText().toString().trim());
-        post.setPost(postEditText.getText().toString().trim());
-        post.setPostType(getIntent().getStringExtra(Posts.POST_TYPE));
-        post.setUserId(LOGGED_IN_USER_ID);
-        post.setPostUser(globalClass.getLoggedInUserData().getUsername());
-        post.setPostTimestamp(Timestamp.now());
-        post.setPostLikes(new ArrayList<String>());
 
         if (imgUri != null) {
             final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
@@ -212,18 +224,31 @@ public class PostQuoteActivity extends AppCompatActivity {
 
                             post.setPostImage(downloadUri.toString());
 
-                            insertPostToDatabase(post, LOGGED_IN_USER_ID);
+                            if (getIntent().getStringExtra("postAction") == null)
+                                insertPostToDatabase(post, firebaseUser.getUid());
+                            else updatePostToDatabase(post);
+
                         }
                     }
                 });
         }
         else {
-            insertPostToDatabase(post, LOGGED_IN_USER_ID);
+            if (getIntent().getStringExtra("postAction") == null)
+                insertPostToDatabase(post, firebaseUser.getUid());
+            else updatePostToDatabase(post);
         }
     }
 
 
     public void insertPostToDatabase(Posts post, final String uid) {
+        post.setPostTitle(postTitleEditText.getText().toString().trim());
+        post.setPost(postEditText.getText().toString().trim());
+        post.setPostType(getIntent().getStringExtra(Posts.POST_TYPE));
+        post.setUserId(firebaseUser.getUid());
+        post.setPostUser(globalClass.getLoggedInUserData().getUsername());
+        post.setPostTimestamp(Timestamp.now());
+        post.setPostLikes(new ArrayList<String>());
+
         firestore.collection(CollectionNames.POSTS)
                 .add(post)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -279,5 +304,25 @@ public class PostQuoteActivity extends AppCompatActivity {
                 });
     }
 
+    public void updatePostToDatabase(Posts post) {
+        WriteBatch batch = firestore.batch();
 
+        DocumentReference postDoc = firestore.collection(CollectionNames.POSTS).document(getIntent().getStringExtra(Posts.POST_ID));
+
+        batch.update(postDoc, Posts.POST, postEditText.getText().toString());
+        batch.update(postDoc, Posts.POST_TITLE, postTitleEditText.getText().toString());
+
+        if (post.getPostImage() != null)
+            batch.update(postDoc, Posts.POST_IMAGE, post.getPostImage());
+
+        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                     if (task.isSuccessful()) {
+                         finish();
+                         startActivity(new Intent(PostQuoteActivity.this, HomeActivity.class));
+                     }
+            }
+        });
+    }
 }

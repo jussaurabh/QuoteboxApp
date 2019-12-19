@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quotebox.PostCommentsActivity;
+import com.example.quotebox.PostQuoteActivity;
 import com.example.quotebox.ProfileActivity;
 import com.example.quotebox.R;
 import com.example.quotebox.controllers.PostController;
@@ -199,6 +200,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                             case R.id.report_post: {
                                 break;
                             }
+                            case R.id.edit_post: {
+                                context.startActivity(new Intent(
+                                        context, PostQuoteActivity.class
+                                ).putExtra(Posts.POST_ID, postsList.get(position)._getPostId())
+                                .putExtra(Posts.POST_TYPE, postsList.get(position).getPostType())
+                                .putExtra("postAction", "edit")
+                                .putExtra(Posts.POST, postsList.get(position).getPost())
+                                .putExtra(Posts.POST_TITLE, postsList.get(position).getPostTitle())
+                                .putExtra(Posts.POST_IMAGE, postsList.get(position).getPostImage()));
+                                break;
+                            }
                             case R.id.delete_post: {
                                 DocumentReference postDocRef = firestore.collection(CollectionNames.POSTS).document(postid);
                                 batch.delete(postDocRef);
@@ -222,7 +234,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostsViewHol
                                 batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        postsList.remove(postid);
+                                        globalClass.getAllPosts().remove(postsList.get(position)._getPostId());
+                                        postsList.remove(position);
+                                        notifyItemRemoved(position);
                                     }
                                 });
 

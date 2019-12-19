@@ -68,6 +68,7 @@ public class ProfileFragment extends Fragment {
     private TextView userProfileAuthornameTV, userFollowerCountTV, userFollowingsCountTV, userLikesCountTV, userAboutTV;
     private Button userQuoteCountBtn, userPoemCountBtn, userStoryCountBtn;
     private LinearLayout userAboutWrapperLL, followerCountWrapperLL, followingCountWrapperLL, postLikeCountWrapperLL;
+    private ProgressBar profileImageLoadingProgressBar;
 
 
     @Nullable
@@ -91,6 +92,7 @@ public class ProfileFragment extends Fragment {
         userQuoteCountBtn = view.findViewById(R.id.userQuoteCountBtn);
         userPoemCountBtn = view.findViewById(R.id.userPoemCountBtn);
         userStoryCountBtn = view.findViewById(R.id.userStoryCountBtn);
+        profileImageLoadingProgressBar = view.findViewById(R.id.profileImageLoadingProgressBar);
 
         userProfileAuthornameTV.setText(loggedInUserData.getUsername());
 
@@ -184,6 +186,8 @@ public class ProfileFragment extends Fragment {
                 data.getData() != null) {
             imgUri = data.getData();
 
+            profileImageLoadingProgressBar.setVisibility(View.VISIBLE);
+
             final StorageReference fileRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imgUri));
 
             fileRef.putFile(imgUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -203,10 +207,12 @@ public class ProfileFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
+                                            profileImageLoadingProgressBar.setVisibility(View.GONE);
                                             Picasso.get().load(imgUri).transform(new ImageCircleTransform())
                                                     .into(userProfileAvatarIV);
                                             globalClass.getAllUsersData().get(loggedInUserData._getUserId())
                                                     .setUserAvatar(newUserAvatar);
+                                            loggedInUserData.setUserAvatar(newUserAvatar);
                                         }
                                     }
                                 });
@@ -229,36 +235,39 @@ public class ProfileFragment extends Fragment {
 
                 builder.setView(v);
                 final AlertDialog dialog = builder.create();
-                builder.show();
 
                 removeImgBtn.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        storageReference.child(loggedInUserData.getUserAvatar()).delete()
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
+//                        storageReference.child(loggedInUserData.getUserAvatar()).delete()
+//                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<Void> task) {
+//                                        if (task.isSuccessful()) {
                                             firestore.collection(CollectionNames.USERS).document(loggedInUserData._getUserId())
                                                     .update(Users.USERAVATAR, null)
                                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             dialog.dismiss();
-                                                            imgUri = null;
-                                                            Picasso.get().load(imgUri).transform(new ImageCircleTransform()).into(userProfileAvatarIV);
+                                                            Picasso.get().load(R.mipmap.ic_avatar_placeholder_round)
+                                                                    .transform(new ImageCircleTransform())
+                                                                    .into(userProfileAvatarIV);
+                                                            globalClass.getAllUsersData().get(loggedInUserData._getUserId())
+                                                                    .setUserAvatar(null);
+                                                            loggedInUserData.setUserAvatar(null);
                                                         }
                                                     });
-                                        } else {
-                                            Toast.makeText(
-                                                    getContext(),
-                                                    "ERRRO on deletin profile image",
-                                                    Toast.LENGTH_LONG
-                                            ).show();
-                                            dialog.dismiss();
-                                        }
-                                    }
-                                });
+//                                        } else {
+//                                            Toast.makeText(
+//                                                    getContext(),
+//                                                    "ERRRO on deletin profile image",
+//                                                    Toast.LENGTH_LONG
+//                                            ).show();
+//                                            dialog.dismiss();
+//                                        }
+//                                    }
+//                                });
 
 
                     }
@@ -267,11 +276,11 @@ public class ProfileFragment extends Fragment {
                 selectImgBtn.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        dialog.cancel();
+                        dialog.dismiss();
                         openFileChooser();
                     }
                 });
-
+                builder.show();
                 break;
             }
         }

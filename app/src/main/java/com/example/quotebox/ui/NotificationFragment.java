@@ -38,6 +38,8 @@ public class NotificationFragment extends Fragment {
             int followRequestCount = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid()).getFollowRequestReceived().size();
             followRequestWrapperLL.setVisibility(View.VISIBLE);
             followRequestCountTV.setText(Integer.toString(followRequestCount));
+        } else {
+            notifyDefaultWrapperLL.setVisibility(View.VISIBLE);
         }
 
         followRequestWrapperLL.setOnClickListener(new View.OnClickListener() {
