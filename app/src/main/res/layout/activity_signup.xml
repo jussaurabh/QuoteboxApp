@@ -78,16 +78,39 @@
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/signupEmailField"
-                style="@style/TransparentBgTextbox"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="email"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/gray" />
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/signupEmailField"
+                    style="@style/TransparentBgTextbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="email"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/gray" />
+
+                <ImageView
+                    android:id="@+id/signupEmailCheckIV"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_check_white" />
+
+                <ProgressBar
+                    android:id="@+id/signupEmailProgressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/signupEmailErrMsg"

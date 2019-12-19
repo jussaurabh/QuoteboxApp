@@ -45,10 +45,10 @@ public class SignupActivity extends AppCompatActivity {
 
     EditText signupUsernameField, signupEmailField, signupPasswordField;
     Button signupSubmitBtn;
-    ProgressBar signupProgressBar, signupUsernameProgressBar;
+    ProgressBar signupProgressBar, signupUsernameProgressBar, signupEmailProgressBar;
     CheckBox signupShowPwdCheckBox;
     TextView signupEmailErrMsg, signupUsernameErrMsg, signupPasswordErrMsg;
-    ImageView signupUsernameCheckImageView;
+    ImageView signupUsernameCheckImageView, signupEmailCheckIV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +62,8 @@ public class SignupActivity extends AppCompatActivity {
         preferencesConfig = new SharedPreferencesConfig(this);
         authController = new AuthController();
 
+        signupEmailProgressBar = findViewById(R.id.signupEmailProgressBar);
+        signupEmailCheckIV = findViewById(R.id.signupEmailCheckIV);
         signupUsernameField = findViewById(R.id.signupUsernameField);
         signupEmailField = findViewById(R.id.signupEmailField);
         signupPasswordField = findViewById(R.id.signupPasswordField);
@@ -83,6 +85,35 @@ public class SignupActivity extends AppCompatActivity {
                 }
                 else {
                     signupEmailField.setBackgroundResource(R.color.transparent);
+                    if (signupEmailField.getText().toString().isEmpty()) return;
+
+                    signupEmailProgressBar.setVisibility(View.VISIBLE);
+
+                    firestore.collection(CollectionNames.USERS)
+                            .whereEqualTo(Users.EMAIL, signupEmailField.getText().toString().trim())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    List<DocumentChange> docChanges = task.getResult().getDocumentChanges();
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        if (docChanges.size() > 0) {
+                                            signupEmailCheckIV.setVisibility(View.GONE);
+                                            signupEmailProgressBar.setVisibility(View.GONE);
+                                            signupEmailField.setBackgroundResource(R.drawable.red_rounded_border);
+                                            signupEmailErrMsg.setText("Email already exists");
+                                            signupEmailErrMsg.setVisibility(View.VISIBLE);
+                                        }
+                                        else {
+                                            signupEmailProgressBar.setVisibility(View.GONE);
+                                            signupEmailCheckIV.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+                                    else {
+                                        Log.d("SIGNUP_ACTIVITY ", Integer.toString(docChanges.size()));
+                                    }
+                                }
+                            });
                 }
             }
         });
@@ -98,6 +129,8 @@ public class SignupActivity extends AppCompatActivity {
 
                 else {
                     signupUsernameField.setBackgroundResource(R.color.transparent);
+                    if (signupUsernameField.getText().toString().isEmpty()) return;
+
                     signupUsernameProgressBar.setVisibility(View.VISIBLE);
 
                     firestore.collection(CollectionNames.USERS)
@@ -116,7 +149,6 @@ public class SignupActivity extends AppCompatActivity {
                                             signupUsernameField.setBackgroundResource(R.drawable.red_rounded_border);
                                             signupUsernameErrMsg.setText("Username already exists");
                                             signupUsernameErrMsg.setVisibility(View.VISIBLE);
-
                                         }
                                         else {
                                             signupUsernameProgressBar.setVisibility(View.GONE);
@@ -178,7 +210,11 @@ public class SignupActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) { }
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().length() > 6) {
+                    signupPasswordErrMsg.setVisibility(View.GONE);
+                }
+            }
         });
 
         signupUsernameField.addTextChangedListener(new TextWatcher() {
@@ -222,9 +258,10 @@ public class SignupActivity extends AppCompatActivity {
         signupSubmitBtn.setVisibility(View.GONE);
         signupProgressBar.setVisibility(View.VISIBLE);
 
-        signupUsernameField.setFocusable(false);
-        signupEmailField.setFocusable(false);
-        signupPasswordField.setFocusable(false);
+        if (signupPasswordField.getText().toString().length() <= 6) {
+            signupPasswordErrMsg.setVisibility(View.VISIBLE);
+            signupPasswordErrMsg.setText("Passoword should be more than 6 characters");
+        }
 
         if (signupUsernameErrMsg.getVisibility() == View.VISIBLE ||
                 signupEmailErrMsg.getVisibility() == View.VISIBLE ||
@@ -256,11 +293,7 @@ public class SignupActivity extends AppCompatActivity {
                             signupProgressBar.setVisibility(View.GONE);
                             signupEmailField.setBackgroundResource(R.drawable.red_rounded_border);
                             signupEmailErrMsg.setVisibility(View.VISIBLE);
-                            signupEmailErrMsg.setText("Email already exists or invalid");
-
-                            signupUsernameField.setFocusable(true);
-                            signupEmailField.setFocusable(true);
-                            signupPasswordField.setFocusable(true);
+                            signupEmailErrMsg.setText("Email is invalid");
                         }
                     }
                 });
