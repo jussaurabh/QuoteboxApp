@@ -48,23 +48,16 @@ public class NotificationFragment extends Fragment {
         View v = inflater.inflate(R.layout.frame_notification, container, false);
         init(v);
 
-        firestore.collection(CollectionNames.NOTIFICATIONS)
-                .whereEqualTo(Users.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            notifyList = task.getResult().toObjects(Notifications.class);
+        getUsersNotifications();
 
-                            notifyListRecyclerView.setVisibility(View.VISIBLE);
-                            notifyDefaultWrapperLL.setVisibility(View.GONE);
+        notifySwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getUsersNotifications();
+                notifySwipeRefresh.setRefreshing(false);
+            }
+        });
 
-                            notificationAdapter = new NotificationAdapter(getContext(), notifyList, globalClass.getAllUsersData());
-                            notifyListRecyclerView.setAdapter(notificationAdapter);
-                        }
-                    }
-                });
 
         if (globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid()).getFollowRequestReceived().size() > 0) {
             int followRequestCount = globalClass.getAllUsersData().get(FirebaseAuth.getInstance().getCurrentUser().getUid()).getFollowRequestReceived().size();
@@ -84,6 +77,26 @@ public class NotificationFragment extends Fragment {
 
 
         return v;
+    }
+
+    public void getUsersNotifications() {
+        firestore.collection(CollectionNames.NOTIFICATIONS)
+                .whereEqualTo(Users.USER_ID, FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            notifyList = task.getResult().toObjects(Notifications.class);
+
+                            notifyListRecyclerView.setVisibility(View.VISIBLE);
+                            notifyDefaultWrapperLL.setVisibility(View.GONE);
+
+                            notificationAdapter = new NotificationAdapter(getContext(), notifyList, globalClass.getAllUsersData());
+                            notifyListRecyclerView.setAdapter(notificationAdapter);
+                        }
+                    }
+                });
     }
 
     public void init(View v) {
